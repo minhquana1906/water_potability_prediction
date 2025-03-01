@@ -23,6 +23,9 @@ MODELS_DIR = PROJ_ROOT / "models"
 
 REPORTS_DIR = PROJ_ROOT / "reports"
 FIGURES_DIR = REPORTS_DIR / "figures"
+CONFUSION_MATRIX_DIR = FIGURES_DIR / "confusion_matrix"
+ROC_CURVE_DIR = FIGURES_DIR / "roc_curve"
+METRICS_DIR = REPORTS_DIR / "metrics"
 
 # If tqdm is installed, configure loguru with tqdm.write
 # https://github.com/Delgan/loguru/issues/135
