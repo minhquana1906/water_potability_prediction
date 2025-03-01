@@ -4,105 +4,243 @@ import pickle
 import typer
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 import yaml
+import mlflow
+import dagshub
+
+from mlflow.models import infer_signature
 from loguru import logger
 from dvclive import Live
 from tqdm import tqdm
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+    roc_auc_score,
+    roc_curve,
+    ConfusionMatrixDisplay,
+    RocCurveDisplay,
+)
+from src.config import (
+    MODELS_DIR,
+    PROCESSED_DATA_DIR,
+    REPORTS_DIR,
+    PARAMS_FILE,
+    METRICS_DIR,
+    CONFUSION_MATRIX_DIR,
+    ROC_CURVE_DIR,
+)
 
-from src.config import MODELS_DIR, PROCESSED_DATA_DIR, REPORTS_DIR, PARAMS_FILE
+dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
+mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
+mlflow.set_experiment("Final model")
+
+MODEL_NAME = "RandomForestClassifier"
 
 app = typer.Typer()
 
 
-def load_params(filepath: Path) -> dict:
-    """Load hyperparameters from a YAML file."""
-    if not filepath.exists():
-        raise FileNotFoundError(f"File {filepath} not found! Cannot load parameters.")
-    with open(filepath, "r") as file:
-        return yaml.safe_load(file)
+def load_yaml(filepath: Path) -> dict:
+    """Load YAML file safely."""
+    try:
+        with open(filepath, "r") as file:
+            return yaml.safe_load(file)
+    except FileNotFoundError:
+        logger.error(f"File {filepath} not found! Cannot load parameters.")
+        raise
+    except yaml.YAMLError as e:
+        logger.exception(f"Error parsing YAML file {filepath}: {e}")
+        raise
 
 
-def load_data(filepath: Path) -> pd.DataFrame:
-    """Load test data from a CSV file."""
-    if not filepath.exists():
-        raise FileNotFoundError(f"File {filepath} not found! Cannot load data.")
-    return pd.read_csv(filepath)
+def load_csv(filepath: Path) -> pd.DataFrame:
+    """Load CSV file safely."""
+    try:
+        return pd.read_csv(filepath)
+    except FileNotFoundError:
+        logger.error(f"File {filepath} not found! Cannot load data.")
+        raise
+    except pd.errors.ParserError as e:
+        logger.exception(f"Error reading CSV file {filepath}: {e}")
+        raise
+
+
+def load_pickle(filepath: Path):
+    """Load a pickle file safely."""
+    try:
+        with open(filepath, "rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        logger.error(f"File {filepath} not found! Cannot load model.")
+        raise
+    except pickle.UnpicklingError as e:
+        logger.exception(f"Error loading pickle file {filepath}: {e}")
+        raise
 
 
 def prepare_data(df: pd.DataFrame, target_col: str) -> tuple[pd.DataFrame, pd.Series]:
     """Split dataset into features and target."""
     if target_col not in df.columns:
         raise KeyError(f"Column {target_col} not found in dataframe!")
-    return df.drop(target_col, axis=1), df[target_col]
+    return df.drop(columns=[target_col]), df[target_col]
 
 
-def load_model(filepath: Path) -> object:
-    """Load a trained model from a pickle file."""
-    if not filepath.exists():
-        raise FileNotFoundError(f"File {filepath} not found! Cannot load model.")
-    with open(filepath, "rb") as f:
-        return pickle.load(f)
+def predict(model, X_test: pd.DataFrame, run_id: str) -> np.ndarray:
+    """Perform predictions and log model to MLflow using an existing run."""
+    try:
+        with mlflow.start_run(run_id=run_id, nested=True):
+            mlflow.sklearn.log_model(
+                sk_model=model,
+                artifact_path=MODEL_NAME,
+                signature=infer_signature(X_test, model.predict(X_test)),
+                input_example=X_test.head(),
+            )
+            logger.info(f"Logged model to MLflow in run {run_id}")
+
+        return model.predict(X_test)
+
+    except Exception as e:
+        logger.exception(f"Error during prediction or MLflow logging: {e}")
+        raise
 
 
-def predict(model: object, X_test: pd.DataFrame) -> np.ndarray:
-    """Perform predictions using the trained model."""
-    return model.predict(X_test)
+def evaluate(y_test: pd.Series, y_pred: np.ndarray, params: dict, run_id: str) -> dict:
+    """Evaluate model performance and log everything to the same MLflow run."""
+    try:
+        metrics = {
+            "accuracy": accuracy_score(y_test, y_pred),
+            "precision": precision_score(y_test, y_pred, zero_division=0),
+            "recall": recall_score(y_test, y_pred, zero_division=0),
+            "f1_score": f1_score(y_test, y_pred, zero_division=0),
+            "roc_auc": roc_auc_score(y_test, y_pred),
+        }
 
+        with mlflow.start_run(run_id=run_id, nested=True):
+            mlflow.log_params(params)
+            mlflow.log_metrics(metrics)
+            logger.info("Logged metrics & params to MLflow.")
 
-def evaluate(y_test: pd.Series, y_pred: np.ndarray, params: dict) -> dict:
-    """Evaluate model performance and log metrics with dvclive."""
-    metrics = {
-        "accuracy": accuracy_score(y_test, y_pred),
-        "precision": precision_score(y_test, y_pred),
-        "recall": recall_score(y_test, y_pred),
-        "f1_score": f1_score(y_test, y_pred),
-    }
+            # Log artifacts
+            cm = confusion_matrix(y_test, y_pred)
+            cm_path = CONFUSION_MATRIX_DIR / "confusion_matrix.png"
+            plot_and_save_confusion_matrix(cm, cm_path)
+            mlflow.log_artifact(str(cm_path))
 
-    # Ensure dvclive syncs with params.yaml
-    with Live(save_dvc_exp=True) as live:
-        live.log_params(params)
+            fpr, tpr, _ = roc_curve(y_test, y_pred)
+            roc_path = ROC_CURVE_DIR / "roc_curve.png"
+            plot_and_save_roc_curve(fpr, tpr, roc_path)
+            mlflow.log_artifact(str(roc_path))
 
-        for metric_name, metric_value in metrics.items():
-            live.log_metric(metric_name, metric_value)
+            logger.info("Logged artifacts (confusion matrix, ROC curve).")
 
-    return metrics
+        return metrics
+
+    except Exception as e:
+        logger.exception(f"Error occurred during evaluation: {e}")
+        raise
 
 
 def save_metrics(metrics: dict, filepath: Path) -> None:
     """Save evaluation metrics to a JSON file."""
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    with open(filepath, "w") as f:
-        json.dump(metrics, f, indent=4)
+    logger.info(f"Saving metrics to {filepath}...")
+    try:
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        with open(filepath, "w") as f:
+            json.dump(metrics, f, indent=4)
+        logger.info("Metrics successfully saved.")
+    except Exception as e:
+        logger.exception(f"Failed to save metrics: {e}")
+        raise
+
+
+def plot_and_save_confusion_matrix(cm: np.ndarray, filepath: Path) -> None:
+    """Plot and save the confusion matrix."""
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=True, yticklabels=True)
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix")
+    plt.savefig(filepath)
+    plt.close()
+
+
+def plot_and_save_roc_curve(fpr, tpr, filepath: Path) -> None:
+    """Plot and save the ROC curve."""
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(6, 5))
+    plt.plot(fpr, tpr, label="ROC Curve")
+    plt.plot([0, 1], [0, 1], linestyle="--")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC Curve")
+    plt.legend()
+    plt.savefig(filepath)
+    plt.close()
+
+
+def save_metrics(metrics: dict, filepath: Path) -> None:
+    """Save evaluation metrics to a JSON file."""
+    logger.info(f"Saving metrics to {filepath}...")
+
+    try:
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        with open(filepath, "w") as f:
+            json.dump(metrics, f, indent=4)
+        logger.info("Metrics successfully saved.")
+    except Exception as e:
+        logger.error(f"Failed to save metrics: {str(e)}", exc_info=True)
 
 
 @app.command()
 def main(
     features_path: Path = PROCESSED_DATA_DIR / "test_processed.csv",
     model_path: Path = MODELS_DIR / "model.pkl",
-    metrics_path: Path = REPORTS_DIR / "metrics.json",
+    metrics_path: Path = METRICS_DIR / "metrics.json",
 ):
     """Perform inference and evaluation on the test dataset."""
-    logger.info("Loading hyperparameters...")
-    params = load_params(PARAMS_FILE)  # Load params once for consistency
+    try:
+        logger.info("Loading hyperparameters...")
+        params = load_yaml(PARAMS_FILE)
 
-    logger.info("Loading test data...")
-    test_data = load_data(features_path)
-    X_test, y_test = prepare_data(test_data, "Potability")
+        logger.info("Loading test data...")
+        test_data = load_csv(features_path)
+        X_test, y_test = prepare_data(test_data, "Potability")
 
-    logger.info("Loading model...")
-    model = load_model(model_path)
+        logger.info("Loading model...")
+        model = load_pickle(model_path)
 
-    logger.info("Performing inference...")
-    y_pred = predict(model, X_test)
+        with mlflow.start_run() as run:
+            run_id = run.info.run_id
+            logger.info(f"Started MLflow run {run_id}")
 
-    logger.info("Evaluating model...")
-    metrics = evaluate(y_test, y_pred, params)
+            logger.info("Performing inference...")
+            y_pred = predict(model, X_test, run_id)
 
-    logger.info("Saving metrics...")
-    save_metrics(metrics, metrics_path)
+            logger.info("Evaluating model...")
+            metrics = evaluate(y_test, y_pred, params, run_id)
 
-    logger.success("Inference and evaluation complete.")
+            logger.info("Saving metrics...")
+            save_metrics(metrics, metrics_path)
+
+            logger.info("Save run id and model name...")
+            run_info = {"run_id": run.info.run_id, "model_name": MODEL_NAME}
+            reports_path = "reports/run_info.json"
+            with open(reports_path, "w") as file:
+                json.dump(run_info, file, indent=4)
+
+        logger.success("Inference and evaluation complete.")
+
+    except Exception as e:
+        logger.exception(f"Pipeline failed: {e}")
+        raise
 
 
 if __name__ == "__main__":

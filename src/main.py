@@ -1,7 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import pickle
 import pandas as pd
-from data_model import Water, WaterTest
+import mlflow
+from loguru import logger
+from data_model import WaterTest
+from src.config import MODELS_DIR
+
 
 app = FastAPI(
     title="Water Potability Prediction API",
@@ -9,22 +13,44 @@ app = FastAPI(
     version="0.1",
 )
 
-model = pickle.load(open("../models/model.pkl", "rb"))
+# Load model
+try:
+    model_path = MODELS_DIR / "model.pkl"
+    with open(model_path, "rb") as file:
+        model = pickle.load(file)
+    logger.success(f"Model loaded from {model_path}")
+except Exception as e:
+    logger.error(f"Failed to load model: {str(e)}")
+    raise RuntimeError("Model loading failed!")
 
 
 @app.get("/")
 def index():
-    return "Welcome to the Water Potability Prediction API!"
+    """Root endpoint"""
+    return {"message": "Welcome to the Water Potability Prediction API!"}
 
 
 @app.post("/predict")
 def predict(water: WaterTest):
-    data = dict(water)  # Convert pydantic model to dictionary
+    """Predict water potability from input features."""
+    try:
+        data_dict = water.dict()
+        data_df = pd.DataFrame([data_dict])
 
-    data_df = pd.DataFrame(data, index=[0])
-    # Convert dictionary to dataframe
+        logger.info(f"Received request: {data_dict}")
 
-    prediction = model.predict(data_df)[0]
-    # Make prediction and get the first element of the result (predict returns a list)
+        prediction = model.predict(data_df)[0]
+        result = "Potable" if prediction == 1 else "Not Potable"
 
-    return "Potable" if prediction == 1 else "Not Potable"
+        # Log prediction to MLflow
+        with mlflow.start_run(nested=True):
+            mlflow.log_params(data_dict)
+            mlflow.log_metric("prediction", int(prediction))
+            logger.info("Logged prediction to MLflow")
+
+        logger.success(f"Prediction: {result}")
+        return {"prediction": result}
+
+    except Exception as e:
+        logger.error(f"Prediction failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Prediction error")

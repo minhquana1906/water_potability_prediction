@@ -6,46 +6,47 @@ from sklearn.model_selection import train_test_split
 from loguru import logger
 from tqdm import tqdm
 
-from src.config import (
-    RAW_DATA_DIR,
-    DATA_DISK,
-    PARAMS_FILE,
-)
+from src.config import RAW_DATA_DIR, DATA_DISK, PARAMS_FILE
 
 app = typer.Typer()
 
 
-def load_params(filepath: Path) -> dict:
+def load_yaml(filepath: Path) -> dict:
     """Load configuration parameters from a YAML file."""
-    try:
-        with open(filepath, "r") as file:
-            return yaml.safe_load(file)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File {filepath} not found! Cannot load parameters.")
+    if not filepath.exists():
+        logger.error(f"File {filepath} not found!")
+        raise FileNotFoundError(f"File {filepath} not found!")
+    with open(filepath, "r") as file:
+        return yaml.safe_load(file)
 
 
-def load_data(filepath: Path) -> pd.DataFrame:
+def load_csv(filepath: Path) -> pd.DataFrame:
     """Load dataset from a CSV file."""
-    try:
-        return pd.read_csv(filepath)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File {filepath} not found! Cannot load data.")
+    if not filepath.exists():
+        logger.error(f"File {filepath} not found!")
+        raise FileNotFoundError(f"File {filepath} not found!")
+    return pd.read_csv(filepath)
 
 
 def split_data(
     data: pd.DataFrame, test_size: float, random_state: int
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split data into training and test sets."""
-    try:
-        return train_test_split(data, test_size=test_size, random_state=random_state)
-    except ValueError:
-        raise ValueError("Invalid parameters for train_test_split!")
+    if not 0 < test_size < 1:
+        logger.error(f"Invalid test_size: {test_size}. It must be between 0 and 1.")
+        raise ValueError("test_size must be between 0 and 1")
+    return train_test_split(data, test_size=test_size, random_state=random_state)
 
 
-def save_data(df: pd.DataFrame, filepath: Path) -> None:
+def save_csv(df: pd.DataFrame, filepath: Path) -> None:
     """Save DataFrame to a CSV file."""
-    filepath.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
-    df.to_csv(filepath, index=False)
+    try:
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        df.to_csv(filepath, index=False)
+        logger.success(f"File saved: {filepath}")
+    except Exception as e:
+        logger.error(f"Failed to save file {filepath}: {str(e)}")
+        raise
 
 
 @app.command()
@@ -57,19 +58,19 @@ def main(
 ):
     """Load dataset, split into train/test, and save outputs."""
     logger.info("Loading parameters...")
-    params = load_params(config_path)
+    params = load_yaml(config_path)
 
     logger.info("Loading dataset...")
-    data = load_data(input_path)
+    data = load_csv(input_path)
 
     logger.info("Splitting dataset into train/test...")
-    train_data, test_data = split_data(data, params["data_ingestion"]["test_size"], 42)
+    train_data, test_data = split_data(data, params["test_size"], 42)
 
     logger.info("Saving train/test datasets...")
     for filepath, df in tqdm(
         zip([train_output_path, test_output_path], [train_data, test_data]), total=2, desc="Saving"
     ):
-        save_data(df, filepath)
+        save_csv(df, filepath)
 
     logger.success("Data splitting complete!")
 

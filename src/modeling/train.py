@@ -1,50 +1,49 @@
 from pathlib import Path
-import os
 import pickle
 import pandas as pd
 import yaml
-from sklearn.ensemble import RandomForestClassifier
 import typer
 from loguru import logger
-from tqdm import tqdm
+from sklearn.ensemble import RandomForestClassifier
 
 from src.config import PROCESSED_DATA_DIR, MODELS_DIR, PARAMS_FILE
 
 app = typer.Typer()
 
 
-def load_params(filepath: Path) -> dict:
-    """Load hyperparameters from a YAML file."""
-    try:
-        with open(filepath, "r") as file:
-            return yaml.safe_load(file)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File {filepath} not found! Cannot load parameters.")
+def load_yaml(filepath: Path) -> dict:
+    """Load a YAML file."""
+    if not filepath.exists():
+        logger.error(f"File {filepath} not found!")
+        raise FileNotFoundError(f"File {filepath} not found!")
+    with open(filepath, "r") as file:
+        return yaml.safe_load(file)
 
 
-def load_data(filepath: Path) -> pd.DataFrame:
-    """Load dataset from a CSV file."""
-    try:
-        return pd.read_csv(filepath)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File {filepath} not found! Cannot load data.")
+def load_csv(filepath: Path) -> pd.DataFrame:
+    """Load a CSV file."""
+    if not filepath.exists():
+        logger.error(f"File {filepath} not found!")
+        raise FileNotFoundError(f"File {filepath} not found!")
+    return pd.read_csv(filepath)
 
 
 def prepare_data(df: pd.DataFrame, target_col: str) -> tuple[pd.DataFrame, pd.Series]:
     """Split dataset into features and target."""
-    try:
-        return df.drop(columns=[target_col]), df[target_col]
-    except KeyError:
-        raise KeyError(f"Column '{target_col}' not found in the dataset!")
+    if target_col not in df.columns:
+        logger.error(f"Column '{target_col}' not found in dataset!")
+        raise KeyError(f"Column '{target_col}' not found in dataset!")
+    return df.drop(columns=[target_col]), df[target_col]
 
 
 def train_model(X_train: pd.DataFrame, y_train: pd.Series, params: dict) -> RandomForestClassifier:
     """Train a Random Forest model."""
-    logger.info("Training model...")
+    logger.info("Training Random Forest model...")
+    model_params = params.get("model_train", {})
     model = RandomForestClassifier(
-        n_estimators=params["model_train"]["n_estimators"],
-        max_depth=params["model_train"]["max_depth"],
-        random_state=params["model_train"].get("random_state", 42),
+        n_estimators=model_params.get("n_estimators", 100),
+        max_depth=model_params.get("max_depth", None),
+        random_state=model_params.get("random_state", 42),
     )
     model.fit(X_train, y_train)
     logger.success("Model training complete.")
@@ -52,7 +51,7 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, params: dict) -> Rand
 
 
 def save_model(model, filepath: Path) -> None:
-    """Save trained model to a file."""
+    """Save the trained model to a file."""
     try:
         filepath.parent.mkdir(parents=True, exist_ok=True)
         with open(filepath, "wb") as f:
@@ -63,15 +62,15 @@ def save_model(model, filepath: Path) -> None:
         raise
 
 
-def train(
+def train_pipeline(
     train_data_path: Path = PROCESSED_DATA_DIR / "train_processed.csv",
     model_path: Path = MODELS_DIR / "model.pkl",
     params_path: Path = PARAMS_FILE,
 ):
-    """Train and save a machine learning model."""
-    logger.info("Loading parameters and data...")
-    params = load_params(params_path)
-    train_data = load_data(train_data_path)
+    """Train a model and save it."""
+    logger.info("Loading hyperparameters and training data...")
+    params = load_yaml(params_path)
+    train_data = load_csv(train_data_path)
 
     X_train, y_train = prepare_data(train_data, "Potability")
 
@@ -82,9 +81,9 @@ def train(
 
 @app.command()
 def main():
-    """Execute full pipeline: train and save model."""
+    """Execute the full training pipeline."""
     logger.info("Starting full training pipeline...")
-    train()
+    train_pipeline()
     logger.success("Pipeline execution complete!")
 
 
