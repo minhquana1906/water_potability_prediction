@@ -68,8 +68,8 @@ data: requirements
 #################################################################################
 
 # Make ci
-.PHONY: ci
-ci: 
+.PHONY: git
+git: 
 	git add .
 	git commit -m "test ci"
 	git push origin dev
