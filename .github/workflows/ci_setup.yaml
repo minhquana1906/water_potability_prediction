@@ -20,6 +20,7 @@ jobs:
         id: setup_uv
         uses: astral-sh/setup@v5
         with:
+          version: '0.6.2'
           python-version: '3.9.21'
           enable-cache: true
           cache-suffix: "optional-suffix"
