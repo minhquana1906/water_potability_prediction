@@ -5,6 +5,7 @@ stages:
     - src/dataset.py
     outs:
     - data/raw/
+  
   data_preprocessing:
     cmd: python src/features.py
     deps:
@@ -12,6 +13,7 @@ stages:
     - src/features.py
     outs:
     - data/processed/
+  
   modeling:
     cmd: python src/modeling/train.py
     deps:
@@ -19,6 +21,7 @@ stages:
     - src/modeling/train.py
     outs:
     - models/model.pkl
+    
   model_evaluation:
     cmd: python src/modeling/predict.py
     deps:
@@ -28,6 +31,7 @@ stages:
     - reports/metrics/metrics.json
     outs:
     - reports/run_info.json
+  
   model_registration:
     cmd: python src/modeling/register.py
     deps:
