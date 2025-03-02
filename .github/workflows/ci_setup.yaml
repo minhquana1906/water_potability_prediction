@@ -34,4 +34,4 @@ jobs:
 
       - name: Run DVC Pipeline
         run: |
-          dvc repro -v
+          dvc repro 

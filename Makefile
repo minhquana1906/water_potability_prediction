@@ -74,6 +74,15 @@ git:
 	git commit -m "test ci"
 	git push origin dev
 
+# Make repro
+.PHONY: repro
+repro: 
+	python src/dataset.py
+	python src/features.py
+	python src/modeling/train.py
+	python src/modeling/predict.py
+	python src/modeling/register.py
+
 
 .DEFAULT_GOAL := help
 

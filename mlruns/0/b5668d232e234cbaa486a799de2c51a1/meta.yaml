@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/b5668d232e234cbaa486a799de2c51a1/artifacts
+end_time: 1740942378617
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: b5668d232e234cbaa486a799de2c51a1
+run_name: colorful-shad-265
+run_uuid: b5668d232e234cbaa486a799de2c51a1
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740942378613
+status: 3
+tags: []
+user_id: minhquana

@@ -4,7 +4,11 @@ import dagshub
 import json
 from pathlib import Path
 from loguru import logger
-from src.config import REPORTS_DIR
+
+# from src.config import REPORTS_DIR
+
+PROJ_ROOT = Path(__file__).resolve().parents[2]
+REPORTS_DIR = PROJ_ROOT / "reports"
 
 # Initialize MLflow with DagsHub
 dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)

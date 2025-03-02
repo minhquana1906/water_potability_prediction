@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/74847080949342bfb583725b6542b78a/artifacts
+end_time: 1740943372821
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 74847080949342bfb583725b6542b78a
+run_name: silent-hawk-558
+run_uuid: 74847080949342bfb583725b6542b78a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740943372815
+status: 3
+tags: []
+user_id: minhquana

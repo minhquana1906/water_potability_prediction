@@ -5,15 +5,13 @@ import yaml
 from sklearn.model_selection import train_test_split
 from loguru import logger
 from tqdm import tqdm
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
+from src.config import RAW_DATA_DIR, DATA_DISK, PARAMS_FILE
 
 PROJ_ROOT = Path(__file__).resolve().parents[1]
-DATA_DISK = PROJ_ROOT / Path(os.getenv("DATA_DISK"))
-PARAMS_FILE = PROJ_ROOT / Path(os.getenv("PARAMS_FILE"))
-RAW_DATA_DIR = PROJ_ROOT / Path(os.getenv("RAW_DATA_DIR"))
+DATA_DISK = PROJ_ROOT / "datasets/water_potability.csv"
+PARAMS_FILE = PROJ_ROOT / "params.yaml"
+RAW_DATA_DIR = PROJ_ROOT / "data/raw"
 
 app = typer.Typer()
 

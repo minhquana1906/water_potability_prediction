@@ -25,15 +25,23 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay,
     RocCurveDisplay,
 )
-from src.config import (
-    MODELS_DIR,
-    PROCESSED_DATA_DIR,
-    REPORTS_DIR,
-    PARAMS_FILE,
-    METRICS_DIR,
-    CONFUSION_MATRIX_DIR,
-    ROC_CURVE_DIR,
-)
+
+# from src.config import (
+#     MODELS_DIR,
+#     PROCESSED_DATA_DIR,
+#     PARAMS_FILE,
+#     METRICS_DIR,
+#     CONFUSION_MATRIX_DIR,
+#     ROC_CURVE_DIR,
+# )
+
+PROJ_ROOT = Path(__file__).resolve().parents[2]
+MODELS_DIR = PROJ_ROOT / "models"
+PROCESSED_DATA_DIR = PROJ_ROOT / "data/processed"
+PARAMS_FILE = PROJ_ROOT / "params.yaml"
+METRICS_DIR = PROJ_ROOT / "reports/metrics"
+CONFUSION_MATRIX_DIR = PROJ_ROOT / "reports/figures/confusion_matrix"
+ROC_CURVE_DIR = PROJ_ROOT / "reports/figures/roc_curve"
 
 dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
 mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")

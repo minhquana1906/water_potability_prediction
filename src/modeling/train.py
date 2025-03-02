@@ -6,7 +6,13 @@ import typer
 from loguru import logger
 from sklearn.ensemble import RandomForestClassifier
 
-from src.config import PROCESSED_DATA_DIR, MODELS_DIR, PARAMS_FILE
+# from src.config import PROCESSED_DATA_DIR, MODELS_DIR, PARAMS_FILE
+
+PROJ_ROOT = Path(__file__).resolve().parents[2]
+PROCESSED_DATA_DIR = PROJ_ROOT / "data/processed"
+MODELS_DIR = PROJ_ROOT / "models"
+PARAMS_FILE = PROJ_ROOT / "params.yaml"
+logger.info(f"PARAM: {PARAMS_FILE}")
 
 app = typer.Typer()
 

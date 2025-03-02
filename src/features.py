@@ -6,7 +6,11 @@ import mlflow
 from loguru import logger
 from tqdm import tqdm
 
-from src.config import RAW_DATA_DIR, PROCESSED_DATA_DIR
+# from src.config import RAW_DATA_DIR, PROCESSED_DATA_DIR
+
+PROJ_ROOT = Path(__file__).resolve().parents[1]
+RAW_DATA_DIR = PROJ_ROOT / "data/raw"
+PROCESSED_DATA_DIR = PROJ_ROOT / "data/processed"
 
 app = typer.Typer()
 

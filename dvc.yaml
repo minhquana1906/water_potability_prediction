@@ -37,6 +37,7 @@ stages:
     deps:
     - reports/run_info.json
     - src/modeling/register.py
+    
 params:
 - dvclive/params.yaml
 metrics:

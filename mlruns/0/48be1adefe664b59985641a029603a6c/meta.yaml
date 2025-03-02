@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/48be1adefe664b59985641a029603a6c/artifacts
+end_time: 1740943159746
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 48be1adefe664b59985641a029603a6c
+run_name: peaceful-shoat-389
+run_uuid: 48be1adefe664b59985641a029603a6c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740943159741
+status: 3
+tags: []
+user_id: minhquana
