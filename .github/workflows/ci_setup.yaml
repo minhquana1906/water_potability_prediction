@@ -25,7 +25,8 @@ jobs:
           python-version: '3.9.21'
           enable-cache: true
           cache-suffix: "optional-suffix"
-          cache-dependency-glob: "requirements.txt"
+          cache-dependency-glob: |
+            **/requirements*.txt
       - run: uv python install 3.9.21
   
   install_dependencies:      
