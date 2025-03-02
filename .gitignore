@@ -1,9 +1,11 @@
 # models
 models/
 reports/
+catboost_info/
 
 # Data
 /data/
+/dataset/
 
 # Mac OS-specific storage files
 .DS_Store

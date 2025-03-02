@@ -10,7 +10,7 @@ load_dotenv()
 PROJ_ROOT = Path(__file__).resolve().parents[1]
 logger.info(f"PROJ_ROOT path is: {PROJ_ROOT}")
 
-DATA_DISK = "/media/minhquana/data_2tb/data/water_potability.csv"
+DATA_DISK = PROJ_ROOT / "datasets/water_potability.csv"
 PARAMS_FILE = PROJ_ROOT / "params.yaml"
 
 DATA_DIR = PROJ_ROOT / "data"
