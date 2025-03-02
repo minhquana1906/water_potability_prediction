@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from loguru import logger
 from tqdm import tqdm
 
-from src.config import RAW_DATA_DIR, DATA_DISK, PARAMS_FILE
+from config import RAW_DATA_DIR, DATA_DISK, PARAMS_FILE
 
 app = typer.Typer()
 

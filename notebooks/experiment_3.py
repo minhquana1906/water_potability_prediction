@@ -27,7 +27,7 @@ from sklearn.metrics import (
     roc_curve,
     RocCurveDisplay,
 )
-from src.config import DATA_DISK, CONFUSION_MATRIX_DIR, ROC_CURVE_DIR, MODELS_DIR
+from config import DATA_DISK, CONFUSION_MATRIX_DIR, ROC_CURVE_DIR, MODELS_DIR
 
 dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
 mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")

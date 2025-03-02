@@ -32,15 +32,6 @@ jobs:
       - name: Install dependencies
         run: uv pip install -r requirements.txt
 
-      
-
-  run_dvc_pipeline:
-    needs: ci_setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
       - name: Run DVC Pipeline
         run: |
           dvc repro -v

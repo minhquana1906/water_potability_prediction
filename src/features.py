@@ -6,7 +6,7 @@ import mlflow
 from loguru import logger
 from tqdm import tqdm
 
-from src.config import RAW_DATA_DIR, PROCESSED_DATA_DIR
+from config import RAW_DATA_DIR, PROCESSED_DATA_DIR
 
 app = typer.Typer()
 

@@ -6,7 +6,7 @@ import typer
 from loguru import logger
 from sklearn.ensemble import RandomForestClassifier
 
-from src.config import PROCESSED_DATA_DIR, MODELS_DIR, PARAMS_FILE
+from config import PROCESSED_DATA_DIR, MODELS_DIR, PARAMS_FILE
 
 app = typer.Typer()
 
