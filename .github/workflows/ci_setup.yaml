@@ -19,7 +19,7 @@ jobs:
       
       - name: Setup UV Python
         id: setup_uv
-        uses: astral-sh/setup@v5
+        uses: astral-sh/setup-uv@v5
         with:
           version: '0.6.2'
           python-version: '3.9.21'
