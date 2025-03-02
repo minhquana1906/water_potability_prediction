@@ -16,7 +16,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - run: ls -R
       
       - name: Show working directory
         run: pwd  
@@ -41,7 +40,8 @@ jobs:
 
       - name: Run DVC Pipeline
         run: |
-          dvc repro
+          ls -R
+          dvc repro -v
 
   # run_dvc_pipeline:
   #   needs: install_dependencies
