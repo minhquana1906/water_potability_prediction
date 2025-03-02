@@ -4,7 +4,7 @@ import pandas as pd
 import mlflow
 from loguru import logger
 from data_model import WaterTest
-from config import MODELS_DIR
+from src.config import MODELS_DIR
 
 
 app = FastAPI(

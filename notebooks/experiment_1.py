@@ -8,7 +8,7 @@ import seaborn as sns
 import mlflow.sklearn
 import dagshub
 from pathlib import Path
-from config import DATA_DISK, CONFUSION_MATRIX_DIR, MODELS_DIR
+from src.config import DATA_DISK, CONFUSION_MATRIX_DIR, MODELS_DIR
 
 from sklearn.ensemble import RandomForestClassifier
 import pickle

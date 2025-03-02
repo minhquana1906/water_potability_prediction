@@ -28,7 +28,7 @@ from sklearn.metrics import (
     roc_curve,
     RocCurveDisplay,
 )
-from config import DATA_DISK, CONFUSION_MATRIX_DIR, ROC_CURVE_DIR, MODELS_DIR
+from src.config import DATA_DISK, CONFUSION_MATRIX_DIR, ROC_CURVE_DIR, MODELS_DIR
 
 model_path: Path = MODELS_DIR / "model.pkl"
 cm_path: Path = CONFUSION_MATRIX_DIR / "confusion_matrix.png"

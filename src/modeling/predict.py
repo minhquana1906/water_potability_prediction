@@ -25,7 +25,7 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay,
     RocCurveDisplay,
 )
-from config import (
+from src.config import (
     MODELS_DIR,
     PROCESSED_DATA_DIR,
     REPORTS_DIR,
