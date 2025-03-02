@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/759f71bfb8524a0fba74c4f1123bffdb/artifacts
+end_time: 1740858359928
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 759f71bfb8524a0fba74c4f1123bffdb
+run_name: gaudy-finch-8
+run_uuid: 759f71bfb8524a0fba74c4f1123bffdb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740858359922
+status: 3
+tags: []
+user_id: minhquana

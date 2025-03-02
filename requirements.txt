@@ -13,7 +13,6 @@ python-dotenv
 scikit-learn
 tqdm
 typer
--e .
 aiohappyeyeballs==2.4.6
 aiohttp==3.11.13
 aiohttp-retry==2.9.1

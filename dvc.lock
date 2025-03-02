@@ -1,0 +1,101 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/dataset.py
+    deps:
+    - path: src/dataset.py
+      hash: md5
+      md5: 4df138e169781242a4d62e8e4271e584
+      size: 2488
+    outs:
+    - path: data/raw/
+      hash: md5
+      md5: 6943e655800134f51910892c621c7b98.dir
+      size: 518984
+      nfiles: 2
+  data_preprocessing:
+    cmd: python src/features.py
+    deps:
+    - path: data/raw/
+      hash: md5
+      md5: 6943e655800134f51910892c621c7b98.dir
+      size: 518984
+      nfiles: 2
+    - path: src/features.py
+      hash: md5
+      md5: ebd6cb1ef0ad3a7690b88d9f20a8d7b9
+      size: 2942
+    outs:
+    - path: data/processed/
+      hash: md5
+      md5: 74c1d1d8cd67f1dc9154360eb2636b52.dir
+      size: 543617
+      nfiles: 2
+  modeling:
+    cmd: python src/modeling/train.py
+    deps:
+    - path: data/processed/
+      hash: md5
+      md5: 74c1d1d8cd67f1dc9154360eb2636b52.dir
+      size: 543617
+      nfiles: 2
+    - path: src/modeling/train.py
+      hash: md5
+      md5: 70ea3b21de16ddd76498e17de326b13c
+      size: 2866
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: 648d7a4fc89226bab2eafc073ecc9f41
+      size: 7344981
+  model_eval:
+    cmd: python src/modeling/predict.py
+    deps:
+    - path: models/model.pkl
+      hash: md5
+      md5: 648d7a4fc89226bab2eafc073ecc9f41
+      size: 7344981
+    - path: src/modeling/predict.py
+      hash: md5
+      md5: 472cbc964b8c07736d4aa0cdb94d928c
+      size: 7825
+    outs:
+    - path: reports/metrics/metrics.json
+      hash: md5
+      md5: c1fedec45dfc5eb34a2ec75d4b8ec769
+      size: 180
+    - path: reports/run_info.json
+      hash: md5
+      md5: 077e9e5d92074cc61988d5af17429116
+      size: 96
+  model_evaluation:
+    cmd: python src/modeling/predict.py
+    deps:
+    - path: models/model.pkl
+      hash: md5
+      md5: 648d7a4fc89226bab2eafc073ecc9f41
+      size: 7344981
+    - path: src/modeling/predict.py
+      hash: md5
+      md5: 472cbc964b8c07736d4aa0cdb94d928c
+      size: 7825
+    outs:
+    - path: reports/metrics/metrics.json
+      hash: md5
+      md5: c1fedec45dfc5eb34a2ec75d4b8ec769
+      size: 180
+    - path: reports/run_info.json
+      hash: md5
+      md5: 077e9e5d92074cc61988d5af17429116
+      size: 96
+  model_registration:
+    cmd: python src/modeling/register.py
+    deps:
+    - path: reports/run_info.json
+      hash: md5
+      md5: 077e9e5d92074cc61988d5af17429116
+      size: 96
+    - path: src/modeling/register.py
+      hash: md5
+      md5: bdb49f6ca56d4289adbef4208faf0134
+      size: 3179

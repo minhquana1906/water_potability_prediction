@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/e9127df9363d47cdba8f08d5d514a30d/artifacts
+end_time: 1740858187081
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: e9127df9363d47cdba8f08d5d514a30d
+run_name: stylish-jay-398
+run_uuid: e9127df9363d47cdba8f08d5d514a30d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740858187074
+status: 3
+tags: []
+user_id: minhquana

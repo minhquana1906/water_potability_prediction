@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/07377507f05545ed8bfa89ce4a1524da/artifacts
+end_time: 1740858187086
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 07377507f05545ed8bfa89ce4a1524da
+run_name: valuable-snake-800
+run_uuid: 07377507f05545ed8bfa89ce4a1524da
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740858187082
+status: 3
+tags: []
+user_id: minhquana
