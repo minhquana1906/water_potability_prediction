@@ -67,6 +67,14 @@ data: requirements
 # Self Documenting Commands                                                     #
 #################################################################################
 
+# Make ci
+.PHONY: ci
+ci: 
+	git add .
+	git commit -m "test ci"
+	git push origin dev
+
+
 .DEFAULT_GOAL := help
 
 define PRINT_HELP_PYSCRIPT

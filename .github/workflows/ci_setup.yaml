@@ -11,27 +11,35 @@ on:
       - dev
 
 jobs:
-  install_dependencies:
+  ci_setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$PWD/src" >> $GITHUB_ENV  
+      - run: ls -R
+      
+      - name: Setup UV Python
+        id: setup_uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: '0.6.2'
+          python-version: '3.9.21'
+          enable-cache: true
+          cache-suffix: "optional-suffix"
+          cache-dependency-glob: |
+            **/requirements*.txt
+      - run: uv python install 3.9.21
 
       - name: Install dependencies
         run: uv pip install -r requirements.txt
 
-  run_dvc_pipeline:
-    needs: install_dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check repo structure
-        run: ls -R 
-
       - name: Run DVC Pipeline
-        run: dvc repro
+        run: |
+          dvc repro
+
+  # run_dvc_pipeline:
+  #   needs: install_dependencies
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
