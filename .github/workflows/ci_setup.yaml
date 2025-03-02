@@ -9,41 +9,55 @@ on:
     branches:
       - main
       - dev
-jobs:
-  install_uv:
-    runs-on: ubuntu-lastest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+# jobs:
+#   install_uv:
+#     runs-on: ubuntu-lastest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
       
-      - name: Setup UV Python
-        id: setup_uv
-        uses: astral-sh/setup@v5
+#       - name: Setup UV Python
+#         id: setup_uv
+#         uses: astral-sh/setup@v5
+#         with:
+#           version: '0.6.2'
+#           python-version: '3.9.21'
+#           enable-cache: true
+#           cache-suffix: "optional-suffix"
+#           cache-dependency-glob: "requirements.txt"
+#       - run: uv python install 3.9.21
+  
+#   install_dependencies:      
+#     needs: install_uv
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Install dependencies
+#         run: uv pip install -r requirements.txt
+
+#   run_dvc_pipeline:
+#     needs: install_dependencies
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Run DVC Pipeline
+#         run: dvc repro
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4   # clone the repository
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          version: '0.6.2'
-          python-version: '3.9.21'
-          enable-cache: true
-          cache-suffix: "optional-suffix"
-          cache-dependency-glob: "requirements.txt"
-      - run: uv python install 3.9.21
-  
-  install_dependencies:      
-    needs: install_uv
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: uv pip install -r requirements.txt
-
-  run_dvc_pipeline:
-    needs: install_dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run DVC Pipeline
-        run: dvc repro
-  
+          python-version: '3.9.21' 
+      
+      - run: | 
+          python --version
+          pip --version
