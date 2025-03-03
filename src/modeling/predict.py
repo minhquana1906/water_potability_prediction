@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import json
 import pickle
 import typer
@@ -43,11 +44,27 @@ METRICS_DIR = PROJ_ROOT / "reports/metrics"
 CONFUSION_MATRIX_DIR = PROJ_ROOT / "reports/figures/confusion_matrix"
 ROC_CURVE_DIR = PROJ_ROOT / "reports/figures/roc_curve"
 
-dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
-mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
-mlflow.set_experiment("Final model")
-
 MODEL_NAME = "RandomForestClassifier"
+
+# This code is only used with browser-based DAGs, in CI pipeline, we need to use the key-based authentication
+# dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
+# mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
+# mlflow.set_experiment("Final model")
+
+
+dagshub_token = os.getenv("DAGSHUB_TOKEN")
+if not dagshub_token:
+    logger.error("DAGSHUB_TOKEN is not set!")
+    raise EnvironmentError("DAGSHUB_TOKEN environment variable is not set!")
+
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+
+dagshub_uri = "https://dagshub.com"
+repo_owner = "minhquana1906"
+repo_name = "water_potability_prediction"
+mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
+mlflow.set_experiment("Final model")
 
 app = typer.Typer()
 

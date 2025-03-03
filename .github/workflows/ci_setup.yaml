@@ -32,6 +32,8 @@ jobs:
       - name: Install dependencies
         run: uv pip install -r requirements.txt
 
-      - name: Run DVC Pipeline
+      - name: Run DVC Pipeline  
+        env:
+          DAGSHUB_TOKEN: ${{secrets.DAGSHUB_TOKEN}}
         run: |
           dvc repro 
