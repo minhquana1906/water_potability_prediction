@@ -35,6 +35,7 @@ jobs:
       - name: Run DVC Pipeline  
         env:
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }} 
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_TOKEN }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
-          echo $DAGSHUB_TOKEN
           dvc repro 

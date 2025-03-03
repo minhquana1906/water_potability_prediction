@@ -53,19 +53,25 @@ MODEL_NAME = "RandomForestClassifier"
 
 
 dagshub_token = os.getenv("DAGSHUB_TOKEN")
-logger.info(f"DAGSHUB_TOKEN: {dagshub_token}")
 if not dagshub_token:
     logger.error("DAGSHUB_TOKEN is not set!")
     raise EnvironmentError("DAGSHUB_TOKEN environment variable is not set!")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
-os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+# os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+# os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+
+# MLFLOW_TRACKING_USERNAME = os.getenv("MLFLOW_TRACKING_USERNAME")
+# MLFLOW_TRACKING_PASSWORD = os.getenv("MLFLOW_TRACKING_PASSWORD")
+
+# os.environ["MLFLOW_TRACKING_USERNAME"] = MLFLOW_TRACKING_USERNAME
+# os.environ["MLFLOW_TRACKING_PASSWORD"] = MLFLOW_TRACKING_PASSWORD
 
 dagshub_uri = "https://dagshub.com"
 repo_owner = "minhquana1906"
 repo_name = "water_potability_prediction"
 
-mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
+# mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
+mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
 mlflow.set_experiment("Final model")
 
 app = typer.Typer()
