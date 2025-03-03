@@ -18,17 +18,16 @@ REPORTS_DIR = PROJ_ROOT / "reports"
 
 
 dagshub_token = os.getenv("DAGSHUB_TOKEN")
-logger.info(f"DAGSHUB_TOKEN: {dagshub_token}")
+dagshub_uri = "https://dagshub.com"
+repo_owner = "minhquana1906"
+repo_name = "water_potability_prediction"
+
 if not dagshub_token:
     logger.error("DAGSHUB_TOKEN is not set!")
     raise EnvironmentError("DAGSHUB_TOKEN environment variable is not set!")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
-
-dagshub_uri = "https://dagshub.com"
-repo_owner = "minhquana1906"
-repo_name = "water_potability_prediction"
 
 mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
 mlflow.set_experiment("Final model")
