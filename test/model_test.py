@@ -43,7 +43,7 @@ class TestModelEvaluation(unittest.TestCase):
 
     def test_model_performance(self):
         """Validate the performance of the newly registered model."""
-        latest_model = get_latest_model_by_alias(MODEL_NAME, "staging")
+        latest_model = client.get_model_version_by_alias(MODEL_NAME, "staging")
         logger.info(f"Latest model: {latest_model}")
         if not latest_model:
             self.fail("No models found with alias 'staging', skipping the test!")
