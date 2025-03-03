@@ -52,7 +52,8 @@ MODEL_NAME = "RandomForestClassifier"
 # mlflow.set_experiment("Final model")
 
 
-dagshub_token = os.getenv("DAGSHUB_TOKEN")
+# dagshub_token = os.getenv("DAGSHUB_TOKEN")
+dagshub_token = "1bbfa67436db449260c68329181667074ffb588d"
 dagshub_uri = "https://dagshub.com"
 repo_owner = "minhquana1906"
 repo_name = "water_potability_prediction"
@@ -61,7 +62,7 @@ if not dagshub_token:
     logger.error("DAGSHUB_TOKEN is not set!")
     raise EnvironmentError("DAGSHUB_TOKEN environment variable is not set!")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 
