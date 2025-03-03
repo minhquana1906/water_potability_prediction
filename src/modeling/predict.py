@@ -184,9 +184,6 @@ def save_metrics(metrics: dict, filepath: Path) -> None:
 
 def plot_and_save_confusion_matrix(cm: np.ndarray, filepath: Path) -> None:
     """Plot and save the confusion matrix."""
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=True, yticklabels=True)
     plt.xlabel("Predicted")
@@ -198,8 +195,6 @@ def plot_and_save_confusion_matrix(cm: np.ndarray, filepath: Path) -> None:
 
 def plot_and_save_roc_curve(fpr, tpr, filepath: Path) -> None:
     """Plot and save the ROC curve."""
-    import matplotlib.pyplot as plt
-
     plt.figure(figsize=(6, 5))
     plt.plot(fpr, tpr, label="ROC Curve")
     plt.plot([0, 1], [0, 1], linestyle="--")
