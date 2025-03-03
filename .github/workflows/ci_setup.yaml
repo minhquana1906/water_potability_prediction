@@ -36,4 +36,5 @@ jobs:
         env:
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }} 
         run: |
+          echo $DAGSHUB_TOKEN
           dvc repro 

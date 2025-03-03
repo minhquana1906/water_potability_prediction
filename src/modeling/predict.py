@@ -64,6 +64,7 @@ os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 dagshub_uri = "https://dagshub.com"
 repo_owner = "minhquana1906"
 repo_name = "water_potability_prediction"
+
 mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
 mlflow.set_experiment("Final model")
 
