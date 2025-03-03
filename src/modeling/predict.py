@@ -45,7 +45,7 @@ METRICS_DIR = PROJ_ROOT / "reports/metrics"
 CONFUSION_MATRIX_DIR = PROJ_ROOT / "reports/figures/confusion_matrix"
 ROC_CURVE_DIR = PROJ_ROOT / "reports/figures/roc_curve"
 
-MODEL_NAME = "RandomForestClassifier"
+MODEL_NAME = "RandomForest"
 
 # This code is only used with browser-based DAGs, in CI pipeline, we need to use the key-based authentication
 # dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)

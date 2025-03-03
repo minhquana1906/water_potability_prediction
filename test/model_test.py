@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 # Project-related configurations
 PROJ_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA = PROJ_ROOT / "data/processed/test_preprocessed.csv"
-MODEL_NAME = "RandomForestClassifier"
+MODEL_NAME = "RandomForest"
 
 # Initialize MLflow Client
 client = MlflowClient()

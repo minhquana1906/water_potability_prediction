@@ -46,3 +46,7 @@ jobs:
         run: |
           python -m unittest test/model_test.py
 
+      - name: Promote model to production
+        if: success()
+        run: |
+          python scripts/promote_model.py
