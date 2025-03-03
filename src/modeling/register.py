@@ -34,35 +34,43 @@ RUN_INFO_PATH = PROJ_ROOT / "reports/run_info.json"
 
 def load_run_info(filepath: Path) -> dict:
     """Load run_id and model_name from JSON."""
-    try:
-        with open(filepath, "r") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        logger.error(f"Error loading run info file {filepath}: {e}")
-        raise
+    with open(filepath, "r") as file:
+        run_info = json.load(file)
+    logger.info("Loaded run information from JSON file.")
+    return run_info
 
 
-def register_model(run_id: str, model_name: str) -> str:
+def register_and_transition_model(
+    client: MlflowClient, run_id: str, model_name: str, new_stage: str = "Staging"
+):
     """Register model to MLflow."""
     model_uri = f"runs:/{run_id}/artifacts/{model_name}"
-    reg = mlflow.register_model(model_uri=model_uri, name=model_name)
+    reg = mlflow.register_model(model_uri, model_name)
+    model_version = reg.version
 
-    logger.info(f"Model {model_name} (version {reg.version}) registered successfully.")
-
-    client.set_model_version_tag(model_name, reg.version, "validation_status", "pending")
-    client.set_registered_model_alias(model_name, "staging", reg.version)
-
-    return reg.version
+    client.transition_model_version_stage(
+        name=model_name, version=model_version, stage=new_stage, archive_existing_versions=True
+    )
+    logger.info(
+        f"Model '{model_name}' version {model_version} transitioned to '{new_stage}' stage."
+    )
+    return model_version
 
 
 def main():
-    """Pipeline to register the model to MLflow."""
+    """Main function to execute the model registration and transition process."""
     logger.info("Registering the model to MLflow...")
-    run_info = load_run_info(RUN_INFO_PATH)
+    # Load run information
+    reports_path = "reports/run_info.json"
+    run_info = load_run_info(reports_path)
     run_id = run_info["run_id"]
     model_name = run_info["model_name"]
 
-    register_model(run_id, model_name)
+    # Register model and transition to Staging
+    client = MlflowClient()
+    model_version = register_and_transition_model(client, run_id, model_name)
+
+    print(f"Model {model_name} version {model_version} transitioned to Staging stage.")
 
 
 if __name__ == "__main__":

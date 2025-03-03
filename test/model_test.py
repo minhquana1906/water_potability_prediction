@@ -6,112 +6,105 @@ import pandas as pd
 from loguru import logger
 from mlflow.tracking import MlflowClient
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+import dagshub
+
 
 # Project-related configurations
 PROJ_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA = PROJ_ROOT / "data/processed/test_preprocessed.csv"
 MODEL_NAME = "RandomForest"
 
-# Initialize MLflow Client
-client = MlflowClient()
+# mlflow_username = os.getenv("MLFLOW_TRACKING_USERNAME")
+# mlflow_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
+
+# if not mlflow_username or not mlflow_password:
+#     logger.error("MLflow authentication credentials are not set!")
+#     raise EnvironmentError("MLflow credentials environment variables are missing!")
+
+# os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_username
+# os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_password
+
+# dagshub_uri = "https://dagshub.com"
+# repo_owner = "minhquana1906"
+# repo_name = "water_potability_prediction"
+
+# mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
+# mlflow.set_experiment("Final model")
+
+# Initialize MLflow with DagsHub
+dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
+mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
+mlflow.set_experiment("Final model")
 
 
-def get_latest_model_by_alias(model_name: str, alias: str):
-    """Retrieve the latest model version associated with a specific alias."""
-    try:
-        version = client.get_model_version_by_alias(model_name, alias)
-        return version
-    except Exception:
-        return None
+class TestModelLoading(unittest.TestCase):
+    """Unit test class to verify MLflow model loading from pending status."""
 
-
-def compare_models(model_name: str, new_version: str, reference_version: str) -> bool:
-    """Compare the newly registered model against a reference model based on accuracy."""
-    new_metrics = client.get_model_version(model_name, new_version).tags
-    ref_metrics = client.get_model_version(model_name, reference_version).tags
-
-    # Extract accuracy metrics
-    new_acc = float(new_metrics.get("metric_accuracy", 0))
-    ref_acc = float(ref_metrics.get("metric_accuracy", 0))
-
-    logger.info(f"New Model Accuracy: {new_acc}, Reference Model Accuracy: {ref_acc}")
-    return new_acc > ref_acc
-
-
-class TestModelEvaluation(unittest.TestCase):
-    """Unit test class for model validation and comparison."""
-
-    def list_models(self):
-        """List all registered models."""
-        from pprint import pprint
-
+    def test_model_in_staging(self):
+        """Test if the model is in 'Staging' stage."""
         client = MlflowClient()
-        for rm in client.search_registered_models():
-            pprint(dict(rm), indent=4)
+        versions = client.get_model_version_by_stage(MODEL_NAME, stages=["Staging"])
 
-    # def test_model_performance(self):
-    #     """Validate the performance of the newly registered model."""
+        if not versions:
+            self.fail("No models found in 'Staging' stage, skipping the loading test!")
 
-    #     latest_model = client.get_model_version_by_alias(MODEL_NAME, "staging")
-    #     logger.info(f"Latest model: {latest_model}")
-    #     if not latest_model:
-    #         self.fail("No models found with alias 'staging', skipping the test!")
+        latest_version = versions[0].version
+        logger.success(f"Model {MODEL_NAME} (version {latest_version}) is in 'Staging' stage!")
 
-    #     # Load model from MLflow
-    #     loaded_model = mlflow.pyfunc.load_model(f"runs:/{latest_model.run_id}/{MODEL_NAME}")
+    def test_model_loading(self):
+        """Test the loading of the model in 'Pending' stage."""
+        client = MlflowClient()
+        versions = client.get_model_version_by_stage(MODEL_NAME, stages=["Pending"])
 
-    #     # Check for test data file existence
-    #     if not TEST_DATA.exists():
-    #         self.fail(f"Test data file {TEST_DATA} does not exist!")
+        if not versions:
+            self.fail("No models found in 'Pending' stage, skipping the loading test!")
 
-    #     test_data = pd.read_csv(TEST_DATA)
-    #     X_test = test_data.drop(columns=["Potability"])
-    #     y_test = test_data["Potability"]
+        latest_version = versions[0].version
+        logged_model = f"runs/{latest_version}/{MODEL_NAME}"
+        try:
+            loaded_model = mlflow.pyfunc.load_model(logged_model)
+        except Exception as e:
+            self.fail(f"Model loading failed with error: {e}")
 
-    #     # Make predictions
-    #     y_pred = loaded_model.predict(X_test)
-    #     acc = accuracy_score(y_test, y_pred)
-    #     prec = precision_score(y_test, y_pred)
-    #     recall = recall_score(y_test, y_pred)
-    #     f1 = f1_score(y_test, y_pred)
+        self.assertIsNotNone(loaded_model, "Model loading failed!")
+        logger.success(f"Model {MODEL_NAME} (version {latest_version}) loaded successfully!")
 
-    #     self.assertGreaterEqual(acc, 0.3, "Accuracy should be at least 30%")
-    #     self.assertGreaterEqual(prec, 0.3, "Precision should be at least 30%")
-    #     self.assertGreaterEqual(recall, 0.3, "Recall should be at least 30%")
-    #     self.assertGreaterEqual(f1, 0.3, "F1 Score should be at least 30%")
+    def test_model_performance(self):
+        """Test the performance of the model in 'Staging' stage."""
+        client = MlflowClient()
+        versions = client.get_model_version_by_stage(MODEL_NAME, stages=["Staging"])
 
-    #     logger.info(
-    #         f"Accuracy: {acc:.4f}, Precision: {prec:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}"
-    #     )
+        if not versions:
+            self.fail("No models found in 'Staging' stage, skipping the performance test!")
 
-    #     # Compare with staging and production models
-    #     staging_model = get_latest_model_by_alias(MODEL_NAME, "staging")
-    #     production_model = get_latest_model_by_alias(MODEL_NAME, "production")
+        latest_version = versions[0].version
+        logged_model = f"runs/{latest_version}/{MODEL_NAME}"
+        loaded_model = mlflow.pyfunc.load_model(logged_model)
 
-    #     if staging_model:
-    #         is_better_than_staging = compare_models(
-    #             MODEL_NAME, latest_model.version, staging_model.version
-    #         )
-    #         if is_better_than_staging:
-    #             logger.success(
-    #                 f"Model {MODEL_NAME} version {latest_model.version} outperforms staging!"
-    #             )
-    #             client.set_registered_model_alias(MODEL_NAME, "staging", latest_model.version)
+        # Load the test data
+        if not TEST_DATA.exists():
+            self.fail(f"Test data file {TEST_DATA} not found!")
 
-    #     if production_model:
-    #         is_better_than_production = compare_models(
-    #             MODEL_NAME, latest_model.version, production_model.version
-    #         )
-    #         if is_better_than_production:
-    #             logger.success(
-    #                 f"Model {MODEL_NAME} version {latest_model.version} outperforms production!"
-    #             )
-    #             client.set_registered_model_alias(MODEL_NAME, "production", latest_model.version)
-    #     else:
-    #         logger.success(
-    #             f"No production model found. Promoting model {MODEL_NAME} version {latest_model.version} to production!"
-    #         )
-    #         client.set_registered_model_alias(MODEL_NAME, "production", latest_model.version)
+        test_data = pd.read_csv(TEST_DATA)
+        X_test = test_data.drop(columns=["Potability"])
+        y_test = test_data["Potability"]
+
+        y_pred = loaded_model.predict(X_test)
+
+        acc = accuracy_score(y_test, y_pred)
+        prec = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred)
+
+        logger.info(f"Accuracy: {acc:.4f}")
+        logger.info(f"Precision: {prec:.4f}")
+        logger.info(f"Recall: {recall:.4f}")
+        logger.info(f"F1 Score: {f1:.4f}")
+
+        self.assertGreaterEqual(acc, 0.3, "Accuracy is below threshold!")
+        self.assertGreaterEqual(prec, 0.3, "Precision is below threshold!")
+        self.assertGreaterEqual(recall, 0.3, "Recall is below threshold!")
+        self.assertGreaterEqual(f1, 0.3, "F1 Score is below threshold!")
 
 
 if __name__ == "__main__":
