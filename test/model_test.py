@@ -43,9 +43,9 @@ class TestModelEvaluation(unittest.TestCase):
 
     def test_model_performance(self):
         """Validate the performance of the newly registered model."""
-        latest_model = get_latest_model_by_alias(MODEL_NAME, "candidate")
+        latest_model = get_latest_model_by_alias(MODEL_NAME, "staging")
         if not latest_model:
-            self.fail("No models found with alias 'candidate', skipping the test!")
+            self.fail("No models found with alias 'staging', skipping the test!")
 
         # Load model from MLflow
         loaded_model = mlflow.pyfunc.load_model(f"models:/{MODEL_NAME}/{latest_model.version}")
