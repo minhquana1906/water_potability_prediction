@@ -1,10 +1,11 @@
-import mlflow
-from mlflow.tracking import MlflowClient
-import dagshub
 import json
-from pathlib import Path
-from loguru import logger
 import os
+from pathlib import Path
+
+import dagshub
+import mlflow
+from loguru import logger
+from mlflow.tracking import MlflowClient
 
 # from src.config import REPORTS_DIR
 
@@ -17,15 +18,14 @@ REPORTS_DIR = PROJ_ROOT / "reports"
 # mlflow.set_experiment("Final model")
 
 
-mlflow_username = os.getenv("MLFLOW_TRACKING_USERNAME")
-mlflow_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
+dagshub_token = os.getenv("DAGSHUB_TOKEN")
 
-if not mlflow_username or not mlflow_password:
+if not dagshub_token:
     logger.error("MLflow authentication credentials are not set!")
     raise EnvironmentError("MLflow credentials environment variables are missing!")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_username
-os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_password
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 dagshub_uri = "https://dagshub.com"
 repo_owner = "minhquana1906"

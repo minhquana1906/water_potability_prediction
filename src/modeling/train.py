@@ -1,8 +1,9 @@
-from pathlib import Path
 import pickle
+from pathlib import Path
+
 import pandas as pd
-import yaml
 import typer
+import yaml
 from loguru import logger
 from sklearn.ensemble import RandomForestClassifier
 

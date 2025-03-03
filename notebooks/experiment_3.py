@@ -1,33 +1,29 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import mlflow
-import dagshub
 import pickle
-from loguru import logger
 from pathlib import Path
+
+import dagshub
+import matplotlib.pyplot as plt
+import mlflow
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from catboost import CatBoostClassifier
+from lightgbm import LGBMClassifier
+from loguru import logger
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (ConfusionMatrixDisplay, RocCurveDisplay,
+                             accuracy_score, confusion_matrix, f1_score,
+                             precision_score, recall_score, roc_auc_score,
+                             roc_curve)
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
 from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import (
-    accuracy_score,
-    recall_score,
-    precision_score,
-    f1_score,
-    confusion_matrix,
-    ConfusionMatrixDisplay,
-    roc_auc_score,
-    roc_curve,
-    RocCurveDisplay,
-)
-from src.config import DATA_DISK, CONFUSION_MATRIX_DIR, ROC_CURVE_DIR, MODELS_DIR
+
+from src.config import (CONFUSION_MATRIX_DIR, DATA_DISK, MODELS_DIR,
+                        ROC_CURVE_DIR)
 
 dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
 mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")

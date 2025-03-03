@@ -1,31 +1,32 @@
-from pathlib import Path
-import os
 import json
+import os
 import pickle
-import typer
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import yaml
-import mlflow
-import dagshub
+from pathlib import Path
 
-from mlflow.models import infer_signature
+import dagshub
+import matplotlib.pyplot as plt
+import mlflow
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import typer
+import yaml
 from loguru import logger
-from dvclive import Live
-from tqdm import tqdm
+from mlflow.models import infer_signature
 from sklearn.metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
     ConfusionMatrixDisplay,
     RocCurveDisplay,
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    roc_curve,
 )
+from tqdm import tqdm
+
+from dvclive import Live
 
 # from src.config import (
 #     MODELS_DIR,
@@ -52,15 +53,14 @@ MODEL_NAME = "RandomForestClassifier"
 # mlflow.set_experiment("Final model")
 
 
-mlflow_username = os.getenv("MLFLOW_TRACKING_USERNAME")
-mlflow_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
+dagshub_token = os.getenv("DAGSHUB_TOKEN")
 
-if not mlflow_username or not mlflow_password:
+if not dagshub_token:
     logger.error("MLflow authentication credentials are not set!")
     raise EnvironmentError("MLflow credentials environment variables are missing!")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_username
-os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_password
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 dagshub_uri = "https://dagshub.com"
 repo_owner = "minhquana1906"

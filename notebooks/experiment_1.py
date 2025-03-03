@@ -1,17 +1,18 @@
 # Import necessary libraries for data handling, machine learning, tracking, and visualization
-import pandas as pd
-import numpy as np
-import mlflow
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
-import mlflow.sklearn
-import dagshub
-from pathlib import Path
-from src.config import DATA_DISK, CONFUSION_MATRIX_DIR, MODELS_DIR
-
-from sklearn.ensemble import RandomForestClassifier
 import pickle
+from pathlib import Path
+
+import dagshub
+import matplotlib.pyplot as plt
+import mlflow
+import mlflow.sklearn
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix
+
+from src.config import CONFUSION_MATRIX_DIR, DATA_DISK, MODELS_DIR
 
 dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
 mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
@@ -64,7 +65,8 @@ with mlflow.start_run():
     y_test = test_processed_data.iloc[:, -1].values  # Target variable for testing
 
     # Import necessary metrics for evaluation
-    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+    from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+                                 recall_score)
 
     # Load the saved model for prediction
     model = pickle.load(open(model_path, "rb"))

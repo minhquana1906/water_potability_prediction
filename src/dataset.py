@@ -1,9 +1,10 @@
 from pathlib import Path
-import typer
+
 import pandas as pd
+import typer
 import yaml
-from sklearn.model_selection import train_test_split
 from loguru import logger
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
 # from src.config import RAW_DATA_DIR, DATA_DISK, PARAMS_FILE

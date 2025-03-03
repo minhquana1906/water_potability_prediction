@@ -1,8 +1,9 @@
 from pathlib import Path
-import typer
-import pandas as pd
-import numpy as np
+
 import mlflow
+import numpy as np
+import pandas as pd
+import typer
 from loguru import logger
 from tqdm import tqdm
 

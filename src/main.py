@@ -1,11 +1,12 @@
-from fastapi import FastAPI, HTTPException
 import pickle
-import pandas as pd
+
 import mlflow
+import pandas as pd
+from fastapi import FastAPI, HTTPException
 from loguru import logger
+
 from data_model import WaterTest
 from src.config import MODELS_DIR
-
 
 app = FastAPI(
     title="Water Potability Prediction API",
