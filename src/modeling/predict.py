@@ -53,6 +53,7 @@ MODEL_NAME = "RandomForestClassifier"
 
 
 dagshub_token = os.getenv("DAGSHUB_TOKEN")
+logger.info(f"DAGSHUB_TOKEN: {dagshub_token}")
 if not dagshub_token:
     logger.error("DAGSHUB_TOKEN is not set!")
     raise EnvironmentError("DAGSHUB_TOKEN environment variable is not set!")
