@@ -1,4 +1,3 @@
-import os
 import unittest
 from pathlib import Path
 
@@ -17,25 +16,26 @@ MODEL_NAME = "RandomForestClassifier"
 client = MlflowClient()
 
 
-def get_latest_model_by_tag(model_name: str, tag_key: str, tag_value: str):
-    """Retrieve the latest model version with the specified tag."""
-    versions = client.search_model_versions(
-        f"name='{model_name}' and tags.{tag_key}='{tag_value}'"
-    )
-    return max(versions, key=lambda v: int(v.version)) if versions else None
+def get_latest_model_by_alias(model_name: str, alias: str):
+    """Retrieve the latest model version associated with a specific alias."""
+    try:
+        version = client.get_model_version_by_alias(model_name, alias)
+        return version
+    except Exception:
+        return None
 
 
-def compare_models(model_name: str, new_version: str, prod_version: str) -> bool:
-    """Compare the newly registered model against the Production model based on accuracy."""
+def compare_models(model_name: str, new_version: str, reference_version: str) -> bool:
+    """Compare the newly registered model against a reference model based on accuracy."""
     new_metrics = client.get_model_version(model_name, new_version).tags
-    prod_metrics = client.get_model_version(model_name, prod_version).tags
+    ref_metrics = client.get_model_version(model_name, reference_version).tags
 
     # Extract accuracy metrics
     new_acc = float(new_metrics.get("metric_accuracy", 0))
-    prod_acc = float(prod_metrics.get("metric_accuracy", 0))
+    ref_acc = float(ref_metrics.get("metric_accuracy", 0))
 
-    logger.info(f"New Model Accuracy: {new_acc}, Production Model Accuracy: {prod_acc}")
-    return new_acc > prod_acc
+    logger.info(f"New Model Accuracy: {new_acc}, Reference Model Accuracy: {ref_acc}")
+    return new_acc > ref_acc
 
 
 class TestModelEvaluation(unittest.TestCase):
@@ -43,12 +43,12 @@ class TestModelEvaluation(unittest.TestCase):
 
     def test_model_performance(self):
         """Validate the performance of the newly registered model."""
-        latest_model = get_latest_model_by_tag(MODEL_NAME, "validation_status", "pending")
+        latest_model = get_latest_model_by_alias(MODEL_NAME, "candidate")
         if not latest_model:
-            self.fail("No models found with 'validation_status' = 'pending', skipping the test!")
+            self.fail("No models found with alias 'candidate', skipping the test!")
 
         # Load model from MLflow
-        loaded_model = mlflow.pyfunc.load_model(f"runs:/{latest_model.run_id}/{MODEL_NAME}")
+        loaded_model = mlflow.pyfunc.load_model(f"models:/{MODEL_NAME}/{latest_model.version}")
 
         # Check for test data file existence
         if not TEST_DATA.exists():
@@ -69,40 +69,34 @@ class TestModelEvaluation(unittest.TestCase):
             f"Accuracy: {acc:.4f}, Precision: {prec:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}"
         )
 
-        # Compare with the Production model (if exists)
-        current_prod = get_latest_model_by_tag(MODEL_NAME, "deployment", "Production")
-        if current_prod:
-            is_better = compare_models(MODEL_NAME, latest_model.version, current_prod.version)
-            if is_better:
-                logger.success(
-                    f"Model {MODEL_NAME} version {latest_model.version} outperforms Production!"
-                )
-                client.set_registered_model_alias(MODEL_NAME, "Champion", latest_model.version)
-                client.set_model_version_tag(
-                    MODEL_NAME, latest_model.version, "deployment", "Production"
-                )
-                client.set_model_version_tag(
-                    MODEL_NAME, latest_model.version, "validation_status", "approved"
-                )
+        # Compare with staging and production models
+        staging_model = get_latest_model_by_alias(MODEL_NAME, "staging")
+        production_model = get_latest_model_by_alias(MODEL_NAME, "production")
 
-                # Remove alias from the previous Production model
-                client.delete_model_version_alias(MODEL_NAME, "Champion", current_prod.version)
-            else:
-                logger.warning(
-                    f"Model {MODEL_NAME} version {latest_model.version} does not outperform the Production model."
+        if staging_model:
+            is_better_than_staging = compare_models(
+                MODEL_NAME, latest_model.version, staging_model.version
+            )
+            if is_better_than_staging:
+                logger.success(
+                    f"Model {MODEL_NAME} version {latest_model.version} outperforms staging!"
                 )
+                client.set_registered_model_alias(MODEL_NAME, "staging", latest_model.version)
+
+        if production_model:
+            is_better_than_production = compare_models(
+                MODEL_NAME, latest_model.version, production_model.version
+            )
+            if is_better_than_production:
+                logger.success(
+                    f"Model {MODEL_NAME} version {latest_model.version} outperforms production!"
+                )
+                client.set_registered_model_alias(MODEL_NAME, "production", latest_model.version)
         else:
-            # If no Production model exists, promote the current model to Production
             logger.success(
-                f"No Production model found. Promoting model {MODEL_NAME} version {latest_model.version} to Production!"
+                f"No production model found. Promoting model {MODEL_NAME} version {latest_model.version} to production!"
             )
-            client.set_registered_model_alias(MODEL_NAME, "Champion", latest_model.version)
-            client.set_model_version_tag(
-                MODEL_NAME, latest_model.version, "deployment", "Production"
-            )
-            client.set_model_version_tag(
-                MODEL_NAME, latest_model.version, "validation_status", "approved"
-            )
+            client.set_registered_model_alias(MODEL_NAME, "production", latest_model.version)
 
 
 if __name__ == "__main__":
