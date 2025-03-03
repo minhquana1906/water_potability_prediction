@@ -17,17 +17,19 @@ REPORTS_DIR = PROJ_ROOT / "reports"
 # mlflow.set_experiment("Final model")
 
 
-dagshub_token = os.getenv("DAGSHUB_TOKEN")
+mlflow_username = os.getenv("MLFLOW_TRACKING_USERNAME")
+mlflow_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
+
+if not mlflow_username or not mlflow_password:
+    logger.error("MLflow authentication credentials are not set!")
+    raise EnvironmentError("MLflow credentials environment variables are missing!")
+
+os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_username
+os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_password
+
 dagshub_uri = "https://dagshub.com"
 repo_owner = "minhquana1906"
 repo_name = "water_potability_prediction"
-
-if not dagshub_token:
-    logger.error("DAGSHUB_TOKEN is not set!")
-    raise EnvironmentError("DAGSHUB_TOKEN environment variable is not set!")
-
-os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
-os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
 mlflow.set_experiment("Final model")
