@@ -16,7 +16,10 @@ client = MlflowClient()
 # for mv in client.search_model_versions("name='RandomForestClassifier'"):
 #     pprint(dict(mv), indent=4)
 
-versions = client.get_model_version_by_alias("RandomForestClassifier", "staging")
-print(versions)
-# pprint(dict(versions), indent=4)
-load_model = mlflow.pyfunc.load_model(f"runs:/{versions.run_id}/{'RandomForestClassifier'}")
+# versions = client.get_model_version_by_alias("RandomForestClassifier", "staging")
+# print(versions)
+# # pprint(dict(versions), indent=4)
+# load_model = mlflow.pyfunc.load_model(f"runs:/{versions.run_id}/{'RandomForestClassifier'}")
+
+testmodel = client.search_model_versions("name='RandomForestClassifier'")[1]
+print(testmodel)
