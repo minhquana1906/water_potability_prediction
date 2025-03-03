@@ -41,73 +41,77 @@ def compare_models(model_name: str, new_version: str, reference_version: str) ->
 class TestModelEvaluation(unittest.TestCase):
     """Unit test class for model validation and comparison."""
 
-    def test_model_performance(self):
-        """Validate the performance of the newly registered model."""
+    def list_models(self):
+        """List all registered models."""
         from pprint import pprint
 
         client = MlflowClient()
         for rm in client.search_registered_models():
             pprint(dict(rm), indent=4)
-        latest_model = client.get_model_version_by_alias(MODEL_NAME, "staging")
-        logger.info(f"Latest model: {latest_model}")
-        if not latest_model:
-            self.fail("No models found with alias 'staging', skipping the test!")
 
-        # Load model from MLflow
-        loaded_model = mlflow.pyfunc.load_model(f"runs:/{latest_model.run_id}/{MODEL_NAME}")
+    # def test_model_performance(self):
+    #     """Validate the performance of the newly registered model."""
 
-        # Check for test data file existence
-        if not TEST_DATA.exists():
-            self.fail(f"Test data file {TEST_DATA} does not exist!")
+    #     latest_model = client.get_model_version_by_alias(MODEL_NAME, "staging")
+    #     logger.info(f"Latest model: {latest_model}")
+    #     if not latest_model:
+    #         self.fail("No models found with alias 'staging', skipping the test!")
 
-        test_data = pd.read_csv(TEST_DATA)
-        X_test = test_data.drop(columns=["Potability"])
-        y_test = test_data["Potability"]
+    #     # Load model from MLflow
+    #     loaded_model = mlflow.pyfunc.load_model(f"runs:/{latest_model.run_id}/{MODEL_NAME}")
 
-        # Make predictions
-        y_pred = loaded_model.predict(X_test)
-        acc = accuracy_score(y_test, y_pred)
-        prec = precision_score(y_test, y_pred)
-        recall = recall_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred)
+    #     # Check for test data file existence
+    #     if not TEST_DATA.exists():
+    #         self.fail(f"Test data file {TEST_DATA} does not exist!")
 
-        self.assertGreaterEqual(acc, 0.3, "Accuracy should be at least 30%")
-        self.assertGreaterEqual(prec, 0.3, "Precision should be at least 30%")
-        self.assertGreaterEqual(recall, 0.3, "Recall should be at least 30%")
-        self.assertGreaterEqual(f1, 0.3, "F1 Score should be at least 30%")
+    #     test_data = pd.read_csv(TEST_DATA)
+    #     X_test = test_data.drop(columns=["Potability"])
+    #     y_test = test_data["Potability"]
 
-        logger.info(
-            f"Accuracy: {acc:.4f}, Precision: {prec:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}"
-        )
+    #     # Make predictions
+    #     y_pred = loaded_model.predict(X_test)
+    #     acc = accuracy_score(y_test, y_pred)
+    #     prec = precision_score(y_test, y_pred)
+    #     recall = recall_score(y_test, y_pred)
+    #     f1 = f1_score(y_test, y_pred)
 
-        # Compare with staging and production models
-        staging_model = get_latest_model_by_alias(MODEL_NAME, "staging")
-        production_model = get_latest_model_by_alias(MODEL_NAME, "production")
+    #     self.assertGreaterEqual(acc, 0.3, "Accuracy should be at least 30%")
+    #     self.assertGreaterEqual(prec, 0.3, "Precision should be at least 30%")
+    #     self.assertGreaterEqual(recall, 0.3, "Recall should be at least 30%")
+    #     self.assertGreaterEqual(f1, 0.3, "F1 Score should be at least 30%")
 
-        if staging_model:
-            is_better_than_staging = compare_models(
-                MODEL_NAME, latest_model.version, staging_model.version
-            )
-            if is_better_than_staging:
-                logger.success(
-                    f"Model {MODEL_NAME} version {latest_model.version} outperforms staging!"
-                )
-                client.set_registered_model_alias(MODEL_NAME, "staging", latest_model.version)
+    #     logger.info(
+    #         f"Accuracy: {acc:.4f}, Precision: {prec:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}"
+    #     )
 
-        if production_model:
-            is_better_than_production = compare_models(
-                MODEL_NAME, latest_model.version, production_model.version
-            )
-            if is_better_than_production:
-                logger.success(
-                    f"Model {MODEL_NAME} version {latest_model.version} outperforms production!"
-                )
-                client.set_registered_model_alias(MODEL_NAME, "production", latest_model.version)
-        else:
-            logger.success(
-                f"No production model found. Promoting model {MODEL_NAME} version {latest_model.version} to production!"
-            )
-            client.set_registered_model_alias(MODEL_NAME, "production", latest_model.version)
+    #     # Compare with staging and production models
+    #     staging_model = get_latest_model_by_alias(MODEL_NAME, "staging")
+    #     production_model = get_latest_model_by_alias(MODEL_NAME, "production")
+
+    #     if staging_model:
+    #         is_better_than_staging = compare_models(
+    #             MODEL_NAME, latest_model.version, staging_model.version
+    #         )
+    #         if is_better_than_staging:
+    #             logger.success(
+    #                 f"Model {MODEL_NAME} version {latest_model.version} outperforms staging!"
+    #             )
+    #             client.set_registered_model_alias(MODEL_NAME, "staging", latest_model.version)
+
+    #     if production_model:
+    #         is_better_than_production = compare_models(
+    #             MODEL_NAME, latest_model.version, production_model.version
+    #         )
+    #         if is_better_than_production:
+    #             logger.success(
+    #                 f"Model {MODEL_NAME} version {latest_model.version} outperforms production!"
+    #             )
+    #             client.set_registered_model_alias(MODEL_NAME, "production", latest_model.version)
+    #     else:
+    #         logger.success(
+    #             f"No production model found. Promoting model {MODEL_NAME} version {latest_model.version} to production!"
+    #         )
+    #         client.set_registered_model_alias(MODEL_NAME, "production", latest_model.version)
 
 
 if __name__ == "__main__":

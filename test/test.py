@@ -2,6 +2,8 @@ from pprint import pprint
 from mlflow.tracking import MlflowClient
 import mlflow
 import dagshub
+from loguru import logger
+
 
 # Initialize MLflow with DagsHub
 dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
@@ -21,5 +23,6 @@ client = MlflowClient()
 # # pprint(dict(versions), indent=4)
 # load_model = mlflow.pyfunc.load_model(f"runs:/{versions.run_id}/{'RandomForestClassifier'}")
 
-testmodel = client.search_model_versions("name='RandomForestClassifier'")[1]
-print(testmodel)
+registered_models = client.list_registered_models()
+for model in registered_models:
+    logger.info(f"Model: {model.name}")

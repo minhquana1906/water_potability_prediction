@@ -39,8 +39,6 @@ jobs:
           echo "DAGSHUB_TOKEN=${{ secrets.DAGSHUB_TOKEN }}" >> $GITHUB_ENV
 
       - name: Run DVC Pipeline  
-        # env:
-        #   DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }} 
         run: |
           dvc repro 
 
@@ -48,4 +46,3 @@ jobs:
         run: |
           python -m unittest test/model_test.py
 
-          
