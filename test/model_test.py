@@ -1,5 +1,6 @@
 import unittest
 from pathlib import Path
+import os
 
 import mlflow
 import pandas as pd
@@ -14,22 +15,22 @@ PROJ_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA = PROJ_ROOT / "data/processed/test_preprocessed.csv"
 MODEL_NAME = "RandomForest"
 
-# mlflow_username = os.getenv("MLFLOW_TRACKING_USERNAME")
-# mlflow_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
+mlflow_username = os.getenv("MLFLOW_TRACKING_USERNAME")
+mlflow_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
-# if not mlflow_username or not mlflow_password:
-#     logger.error("MLflow authentication credentials are not set!")
-#     raise EnvironmentError("MLflow credentials environment variables are missing!")
+if not mlflow_username or not mlflow_password:
+    logger.error("MLflow authentication credentials are not set!")
+    raise EnvironmentError("MLflow credentials environment variables are missing!")
 
-# os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_username
-# os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_password
+os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_username
+os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_password
 
-# dagshub_uri = "https://dagshub.com"
-# repo_owner = "minhquana1906"
-# repo_name = "water_potability_prediction"
+dagshub_uri = "https://dagshub.com"
+repo_owner = "minhquana1906"
+repo_name = "water_potability_prediction"
 
-# mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
-# mlflow.set_experiment("Final model")
+mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
+mlflow.set_experiment("Final model")
 
 # Initialize MLflow with DagsHub
 dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
