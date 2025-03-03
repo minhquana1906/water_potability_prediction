@@ -43,13 +43,11 @@ jobs:
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
           dvc repro 
-
-      - name: Model comparison and testing
+      - name: Model testing
         env:
-          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }} 
         run: |
           python -m unittest test/model_test.py
-
       - name: Promote model to production
         if: success()
         env:
