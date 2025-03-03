@@ -65,6 +65,11 @@ class TestModelEvaluation(unittest.TestCase):
         recall = recall_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred)
 
+        self.assertGreaterEqual(acc, 0.3, "Accuracy should be at least 30%")
+        self.assertGreaterEqual(prec, 0.3, "Precision should be at least 30%")
+        self.assertGreaterEqual(recall, 0.3, "Recall should be at least 30%")
+        self.assertGreaterEqual(f1, 0.3, "F1 Score should be at least 30%")
+
         logger.info(
             f"Accuracy: {acc:.4f}, Precision: {prec:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}"
         )

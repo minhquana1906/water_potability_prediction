@@ -50,7 +50,7 @@ def register_model(run_id: str, model_name: str) -> str:
     logger.info(f"Model {model_name} (version {reg.version}) registered successfully.")
 
     client.set_model_version_tag(model_name, reg.version, "validation_status", "pending")
-    client.set_registered_model_alias(model_name, "Staging", reg.version)
+    client.set_registered_model_alias(model_name, "staging", reg.version)
 
     return reg.version
 
