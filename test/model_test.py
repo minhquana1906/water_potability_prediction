@@ -43,6 +43,8 @@ class TestModelEvaluation(unittest.TestCase):
 
     def test_model_performance(self):
         """Validate the performance of the newly registered model."""
+        test_model = client.search_model_versions(f"name='{MODEL_NAME}'")
+        logger.info(f"Test model: {test_model}")
         latest_model = client.get_model_version_by_alias(MODEL_NAME, "staging")
         logger.info(f"Latest model: {latest_model}")
         if not latest_model:
