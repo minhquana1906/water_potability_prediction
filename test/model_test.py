@@ -19,10 +19,8 @@ client = MlflowClient()
 def get_latest_model_by_alias(model_name: str, alias: str):
     """Retrieve the latest model version associated with a specific alias."""
     try:
-        versions = client.search_model_versions(
-            f"name='{model_name}' and tags.{tag_key}='{tag_value}'"
-        )
-        return max(versions, key=lambda v: int(v.version)) if versions else None
+        version = client.get_model_version_by_alias(model_name, alias)
+        return version
     except Exception:
         return None
 
@@ -50,7 +48,7 @@ class TestModelEvaluation(unittest.TestCase):
             self.fail("No models found with alias 'staging', skipping the test!")
 
         # Load model from MLflow
-        loaded_model = mlflow.pyfunc.load_model(f"models:/{MODEL_NAME}/{latest_model.version}")
+        loaded_model = mlflow.pyfunc.load_model(f"runs:/{latest_model.run_id}/{MODEL_NAME}")
 
         # Check for test data file existence
         if not TEST_DATA.exists():
