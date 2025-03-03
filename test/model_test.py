@@ -19,8 +19,10 @@ client = MlflowClient()
 def get_latest_model_by_alias(model_name: str, alias: str):
     """Retrieve the latest model version associated with a specific alias."""
     try:
-        version = client.get_model_version_by_alias(model_name, alias)
-        return version
+        versions = client.search_model_versions(
+            f"name='{model_name}' and tags.{tag_key}='{tag_value}'"
+        )
+        return max(versions, key=lambda v: int(v.version)) if versions else None
     except Exception:
         return None
 
