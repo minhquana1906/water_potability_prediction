@@ -124,6 +124,7 @@ def predict(model, X_test: pd.DataFrame, run_id: str) -> np.ndarray:
             mlflow.sklearn.log_model(
                 sk_model=model,
                 artifact_path=MODEL_NAME,
+                registered_model_name=MODEL_NAME,
                 signature=infer_signature(X_test, model.predict(X_test)),
                 input_example=X_test.head(),
             )
