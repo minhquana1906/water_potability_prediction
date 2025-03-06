@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import mlflow
-import numpy as np
 import pandas as pd
 import typer
 from loguru import logger

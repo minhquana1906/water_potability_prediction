@@ -54,7 +54,7 @@ class TestModelLoading(unittest.TestCase):
     def test_model_loading(self):
         """Test the loading of the model in 'Pending' stage."""
         client = MlflowClient()
-        versions = client.get_model_version_by_stage(MODEL_NAME, stages=["Pending"])
+        versions = client.get_model_version_by_stage(MODEL_NAME, stages=["Staging"])
 
         if not versions:
             self.fail("No models found in 'Pending' stage, skipping the loading test!")

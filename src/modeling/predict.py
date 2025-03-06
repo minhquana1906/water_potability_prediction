@@ -3,7 +3,6 @@ import os
 import pickle
 from pathlib import Path
 
-import dagshub
 import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
@@ -14,8 +13,8 @@ import yaml
 from loguru import logger
 from mlflow.models import infer_signature
 from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    RocCurveDisplay,
+    # ConfusionMatrixDisplay,
+    # RocCurveDisplay,
     accuracy_score,
     confusion_matrix,
     f1_score,
@@ -24,18 +23,6 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from tqdm import tqdm
-
-from dvclive import Live
-
-# from src.config import (
-#     MODELS_DIR,
-#     PROCESSED_DATA_DIR,
-#     PARAMS_FILE,
-#     METRICS_DIR,
-#     CONFUSION_MATRIX_DIR,
-#     ROC_CURVE_DIR,
-# )
 
 PROJ_ROOT = Path(__file__).resolve().parents[2]
 MODELS_DIR = PROJ_ROOT / "models"
@@ -207,19 +194,6 @@ def plot_and_save_roc_curve(fpr, tpr, filepath: Path) -> None:
     plt.legend()
     plt.savefig(filepath)
     plt.close()
-
-
-def save_metrics(metrics: dict, filepath: Path) -> None:
-    """Save evaluation metrics to a JSON file."""
-    logger.info(f"Saving metrics to {filepath}...")
-
-    try:
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-        with open(filepath, "w") as f:
-            json.dump(metrics, f, indent=4)
-        logger.info("Metrics successfully saved.")
-    except Exception as e:
-        logger.error(f"Failed to save metrics: {str(e)}", exc_info=True)
 
 
 @app.command()
