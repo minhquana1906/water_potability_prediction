@@ -32,9 +32,9 @@ mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
 mlflow.set_experiment("Final model")
 
 # Initialize MLflow with DagsHub
-dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
-mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
-mlflow.set_experiment("Final model")
+# dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
+# mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
+# mlflow.set_experiment("Final model")
 
 
 class TestModelLoading(unittest.TestCase):
