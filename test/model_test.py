@@ -38,7 +38,7 @@ mlflow.set_experiment("Final model")
 
 
 class TestModelLoading(unittest.TestCase):
-    """Unit test class to verify MLflow model loading from pending status."""
+    """Unit test class to verify MLflow model loading from Staging status."""
 
     def test_model_in_staging(self):
         """Test if the model is in 'Staging' stage."""
@@ -52,15 +52,16 @@ class TestModelLoading(unittest.TestCase):
         logger.success(f"Model {MODEL_NAME} (version {latest_version}) is in 'Staging' stage!")
 
     def test_model_loading(self):
-        """Test the loading of the model in 'Pending' stage."""
+        """Test the loading of the model in 'Staging' stage."""
         client = MlflowClient()
         versions = client.get_latest_versions(MODEL_NAME, stages=["Staging"])
 
         if not versions:
-            self.fail("No models found in 'Pending' stage, skipping the loading test!")
+            self.fail("No models found in 'Staging' stage, skipping the loading test!")
 
         latest_version = versions[0].version
-        logged_model = f"runs/{latest_version}/{MODEL_NAME}"
+        run_id = versions[0].run_id
+        logged_model = f"runs/{run_id}/{MODEL_NAME}"
         try:
             loaded_model = mlflow.pyfunc.load_model(logged_model)
         except Exception as e:
@@ -78,7 +79,8 @@ class TestModelLoading(unittest.TestCase):
             self.fail("No models found in 'Staging' stage, skipping the performance test!")
 
         latest_version = versions[0].version
-        logged_model = f"runs/{latest_version}/{MODEL_NAME}"
+        run_id = versions[0].run_id
+        logged_model = f"runs/{run_id}/{MODEL_NAME}"
         loaded_model = mlflow.pyfunc.load_model(logged_model)
 
         # Load the test data
