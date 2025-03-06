@@ -22,7 +22,7 @@ repo_name = "water_potability_prediction"
 def promote_model_to_production():
     """Promote the model to production."""
     client = MlflowClient()
-    staging_versions = client.get_latest_versions(MODEL_NAME, stages=["staging"])
+    staging_versions = client.get_latest_versions(MODEL_NAME, stages=["Staging"])
     if not staging_versions:
         logger.error(f"No staging versions found for model {MODEL_NAME}!")
         return
@@ -30,7 +30,7 @@ def promote_model_to_production():
     latest_staging_version = staging_versions[0]
     staging_version_number = latest_staging_version.version
 
-    production_versions = client.get_latest_versions(MODEL_NAME, stages=["production"])
+    production_versions = client.get_latest_versions(MODEL_NAME, stages=["Production"])
 
     if production_versions:
         current_production_version = production_versions[0]
@@ -38,7 +38,7 @@ def promote_model_to_production():
         client.transition_model_version_stage(
             name=MODEL_NAME,
             version=production_version_number,
-            stage="archived",
+            stage="Archived",
             archive_existing_versions=False,
         )
         logger.info(f"Model {MODEL_NAME} version {production_version_number} archived.")
@@ -49,7 +49,7 @@ def promote_model_to_production():
     client.transition_model_version_stage(
         name=MODEL_NAME,
         version=staging_version_number,
-        stage="production",
+        stage="Production",
         archive_existing_versions=False,
     )
     logger.success(f"Model {MODEL_NAME} version {staging_version_number} promoted to production!")
