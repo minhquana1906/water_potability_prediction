@@ -12,7 +12,7 @@ import dagshub
 
 # Project-related configurations
 PROJ_ROOT = Path(__file__).resolve().parents[1]
-TEST_DATA = PROJ_ROOT / "data/processed/test_preprocessed.csv"
+TEST_DATA = PROJ_ROOT / "data/processed/test_processed.csv"
 MODEL_NAME = "RandomForest"
 
 dagshub_token = os.getenv("DAGSHUB_TOKEN")
