@@ -43,7 +43,7 @@ class TestModelLoading(unittest.TestCase):
     def test_model_in_staging(self):
         """Test if the model is in 'Staging' stage."""
         client = MlflowClient()
-        versions = client.get_model_version_by_stage(MODEL_NAME, stages=["Staging"])
+        versions = client.get_latest_versions(MODEL_NAME, stages=["Staging"])
 
         if not versions:
             self.fail("No models found in 'Staging' stage, skipping the loading test!")
@@ -54,7 +54,7 @@ class TestModelLoading(unittest.TestCase):
     def test_model_loading(self):
         """Test the loading of the model in 'Pending' stage."""
         client = MlflowClient()
-        versions = client.get_model_version_by_stage(MODEL_NAME, stages=["Staging"])
+        versions = client.get_latest_versions(MODEL_NAME, stages=["Staging"])
 
         if not versions:
             self.fail("No models found in 'Pending' stage, skipping the loading test!")
@@ -72,7 +72,7 @@ class TestModelLoading(unittest.TestCase):
     def test_model_performance(self):
         """Test the performance of the model in 'Staging' stage."""
         client = MlflowClient()
-        versions = client.get_model_version_by_stage(MODEL_NAME, stages=["Staging"])
+        versions = client.get_latest_versions(MODEL_NAME, stages=["Staging"])
 
         if not versions:
             self.fail("No models found in 'Staging' stage, skipping the performance test!")
