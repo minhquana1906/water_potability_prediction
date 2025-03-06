@@ -69,7 +69,7 @@ data: requirements
 
 # Make ci
 .PHONY: ci
-ci: 
+ci:
 	git add .
 	git commit -m "test ci"
 	git push origin dev
