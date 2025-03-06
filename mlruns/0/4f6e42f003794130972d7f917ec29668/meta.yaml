@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/4f6e42f003794130972d7f917ec29668/artifacts
+end_time: 1740858359934
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 4f6e42f003794130972d7f917ec29668
+run_name: bedecked-duck-850
+run_uuid: 4f6e42f003794130972d7f917ec29668
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740858359929
+status: 3
+tags: []
+user_id: minhquana

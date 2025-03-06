@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/aff5759bf3ea4331ab5d79f584edccfb/artifacts
+end_time: 1740943159740
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: aff5759bf3ea4331ab5d79f584edccfb
+run_name: rare-gnu-422
+run_uuid: aff5759bf3ea4331ab5d79f584edccfb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740943159733
+status: 3
+tags: []
+user_id: minhquana

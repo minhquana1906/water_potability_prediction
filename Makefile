@@ -29,14 +29,14 @@ clean:
 ## Lint using flake8 and black (use `make format` to do formatting)
 .PHONY: lint
 lint:
-	flake8 water_potability_prediction
-	isort --check --diff --profile black water_potability_prediction
-	black --check --config pyproject.toml water_potability_prediction
+	flake8 src
+	isort --check --diff --profile black src
+	black --check --config pyproject.toml src
 
 ## Format source code with black
 .PHONY: format
 format:
-	black --config pyproject.toml water_potability_prediction
+	black --config pyproject.toml src
 
 
 
@@ -66,6 +66,23 @@ data: requirements
 #################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
+
+# Make ci
+.PHONY: ci
+ci:
+	git add .
+	git commit -m "test ci"
+	git push origin dev
+
+# Make repro
+.PHONY: repro
+repro: 
+	python src/dataset.py
+	python src/features.py
+	python src/modeling/train.py
+	python src/modeling/predict.py
+	python src/modeling/register.py
+
 
 .DEFAULT_GOAL := help
 

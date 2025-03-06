@@ -1,0 +1,15 @@
+artifact_uri: file:///home/minhquana/workspace/water_potability_prediction/mlruns/0/a6594153d5b14d51b40b29881aa740af/artifacts
+end_time: 1740942378612
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a6594153d5b14d51b40b29881aa740af
+run_name: efficient-bass-908
+run_uuid: a6594153d5b14d51b40b29881aa740af
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740942378605
+status: 3
+tags: []
+user_id: minhquana

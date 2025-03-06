@@ -1,45 +1,60 @@
-from pathlib import Path
 import json
+import os
 import pickle
-import typer
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import yaml
-import mlflow
-import dagshub
+from pathlib import Path
 
-from mlflow.models import infer_signature
+import matplotlib.pyplot as plt
+import mlflow
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import typer
+import yaml
 from loguru import logger
-from dvclive import Live
-from tqdm import tqdm
+from mlflow.models import infer_signature
 from sklearn.metrics import (
+    # ConfusionMatrixDisplay,
+    # RocCurveDisplay,
     accuracy_score,
+    confusion_matrix,
+    f1_score,
     precision_score,
     recall_score,
-    f1_score,
-    confusion_matrix,
     roc_auc_score,
     roc_curve,
-    ConfusionMatrixDisplay,
-    RocCurveDisplay,
-)
-from src.config import (
-    MODELS_DIR,
-    PROCESSED_DATA_DIR,
-    REPORTS_DIR,
-    PARAMS_FILE,
-    METRICS_DIR,
-    CONFUSION_MATRIX_DIR,
-    ROC_CURVE_DIR,
 )
 
-dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
-mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
+PROJ_ROOT = Path(__file__).resolve().parents[2]
+MODELS_DIR = PROJ_ROOT / "models"
+PROCESSED_DATA_DIR = PROJ_ROOT / "data/processed"
+PARAMS_FILE = PROJ_ROOT / "params.yaml"
+METRICS_DIR = PROJ_ROOT / "reports/metrics"
+CONFUSION_MATRIX_DIR = PROJ_ROOT / "reports/figures/confusion_matrix"
+ROC_CURVE_DIR = PROJ_ROOT / "reports/figures/roc_curve"
+
+MODEL_NAME = "RandomForest"
+
+# This code is only used with browser-based DAGs, in CI pipeline, we need to use the key-based authentication
+# dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
+# mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
+# mlflow.set_experiment("Final model")
+
+
+dagshub_token = os.getenv("DAGSHUB_TOKEN")
+
+if not dagshub_token:
+    logger.error("MLflow authentication credentials are not set!")
+    raise EnvironmentError("MLflow credentials environment variables are missing!")
+
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+
+dagshub_uri = "https://dagshub.com"
+repo_owner = "minhquana1906"
+repo_name = "water_potability_prediction"
+
+mlflow.set_tracking_uri(f"{dagshub_uri}/{repo_owner}/{repo_name}.mlflow")
 mlflow.set_experiment("Final model")
-
-MODEL_NAME = "RandomForestClassifier"
 
 app = typer.Typer()
 
@@ -159,9 +174,6 @@ def save_metrics(metrics: dict, filepath: Path) -> None:
 
 def plot_and_save_confusion_matrix(cm: np.ndarray, filepath: Path) -> None:
     """Plot and save the confusion matrix."""
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=True, yticklabels=True)
     plt.xlabel("Predicted")
@@ -173,8 +185,6 @@ def plot_and_save_confusion_matrix(cm: np.ndarray, filepath: Path) -> None:
 
 def plot_and_save_roc_curve(fpr, tpr, filepath: Path) -> None:
     """Plot and save the ROC curve."""
-    import matplotlib.pyplot as plt
-
     plt.figure(figsize=(6, 5))
     plt.plot(fpr, tpr, label="ROC Curve")
     plt.plot([0, 1], [0, 1], linestyle="--")
@@ -184,19 +194,6 @@ def plot_and_save_roc_curve(fpr, tpr, filepath: Path) -> None:
     plt.legend()
     plt.savefig(filepath)
     plt.close()
-
-
-def save_metrics(metrics: dict, filepath: Path) -> None:
-    """Save evaluation metrics to a JSON file."""
-    logger.info(f"Saving metrics to {filepath}...")
-
-    try:
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-        with open(filepath, "w") as f:
-            json.dump(metrics, f, indent=4)
-        logger.info("Metrics successfully saved.")
-    except Exception as e:
-        logger.error(f"Failed to save metrics: {str(e)}", exc_info=True)
 
 
 @app.command()

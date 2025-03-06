@@ -1,19 +1,3 @@
-black
-flake8
-ipython
-isort
-jupyterlab
-loguru
-matplotlib
-notebook
-numpy
-pandas
-pip
-python-dotenv
-scikit-learn
-tqdm
-typer
--e .
 aiohappyeyeballs==2.4.6
 aiohttp==3.11.13
 aiohttp-retry==2.9.1
@@ -43,6 +27,7 @@ blinker==1.9.0
 boto3==1.37.2
 botocore==1.37.2
 cachetools==5.5.2
+catboost==1.2.7
 celery==5.4.0
 certifi==2025.1.31
 cffi==1.17.1
@@ -108,6 +93,7 @@ grandalf==0.8
 graphene==3.4.3
 graphql-core==3.2.3
 graphql-relay==3.2.0
+graphviz==0.20.3
 greenlet==3.1.1
 gto==1.7.2
 gunicorn==23.0.0
@@ -119,6 +105,7 @@ hydra-core==1.3.2
 idna==3.10
 importlib_metadata==8.5.0
 importlib_resources==6.5.2
+iniconfig==2.0.0
 ipykernel==6.29.5
 ipython==8.18.1
 isoduration==20.11.0
@@ -144,6 +131,7 @@ jupyterlab_pygments==0.3.0
 jupyterlab_server==2.27.3
 kiwisolver==1.4.7
 kombu==5.4.2
+lightgbm==4.6.0
 loguru==0.7.3
 lxml==5.3.1
 Mako==1.3.9
@@ -163,6 +151,7 @@ mlflow==2.20.3
 mlflow-skinny==2.20.3
 multidict==6.1.0
 mypy-extensions==1.0.0
+narwhals==1.28.0
 nbclient==0.10.2
 nbconvert==7.16.6
 nbformat==5.10.4
@@ -170,8 +159,9 @@ nest-asyncio==1.6.0
 networkx==3.2.1
 notebook==7.3.2
 notebook_shim==0.2.4
-numpy==2.0.2
+numpy==1.26.4
 nvidia-ml-py==12.570.86
+nvidia-nccl-cu12==2.25.1
 omegaconf==2.3.0
 opentelemetry-api==1.30.0
 opentelemetry-sdk==1.30.0
@@ -187,6 +177,8 @@ pathvalidate==3.2.3
 pexpect==4.9.0
 pillow==11.1.0
 platformdirs==4.3.6
+plotly==6.0.0
+pluggy==1.5.0
 prometheus_client==0.21.1
 prompt_toolkit==3.0.50
 propcache==0.3.0
@@ -210,6 +202,7 @@ Pygments==2.19.1
 pygtrie==2.5.0
 pynvml==12.0.0
 pyparsing==3.2.1
+pytest==8.3.5
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-json-logger==3.2.1
@@ -281,6 +274,7 @@ websocket-client==1.8.0
 websockets==15.0
 Werkzeug==3.1.3
 wrapt==1.17.2
+xgboost==2.1.4
 yarl==1.18.3
 zc.lockfile==3.0.post1
 zipp==3.21.0
