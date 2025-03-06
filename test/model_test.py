@@ -59,16 +59,14 @@ class TestModelLoading(unittest.TestCase):
         if not versions:
             self.fail("No models found in 'Staging' stage, skipping the loading test!")
 
-        latest_version = versions[0].version
-        run_id = versions[0].run_id
-        logged_model = f"runs/{run_id}/{MODEL_NAME}"
         try:
-            loaded_model = mlflow.pyfunc.load_model(logged_model)
+            run_id = versions[0].run_id
+            model = mlflow.pyfunc.load_model(f"runs:/{run_id}/{MODEL_NAME}")
         except Exception as e:
             self.fail(f"Model loading failed with error: {e}")
 
-        self.assertIsNotNone(loaded_model, "Model loading failed!")
-        logger.success(f"Model {MODEL_NAME} (version {latest_version}) loaded successfully!")
+        self.assertIsNotNone(model, "Model loading failed!")
+        logger.success(f"Model {MODEL_NAME} (version {versions[0].version}) loaded successfully!")
 
     def test_model_performance(self):
         """Test the performance of the model in 'Staging' stage."""
@@ -78,10 +76,8 @@ class TestModelLoading(unittest.TestCase):
         if not versions:
             self.fail("No models found in 'Staging' stage, skipping the performance test!")
 
-        latest_version = versions[0].version
         run_id = versions[0].run_id
-        logged_model = f"runs/{run_id}/{MODEL_NAME}"
-        loaded_model = mlflow.pyfunc.load_model(logged_model)
+        model = mlflow.pyfunc.load_model(f"runs:/{run_id}/{MODEL_NAME}")
 
         # Load the test data
         if not TEST_DATA.exists():
@@ -91,7 +87,7 @@ class TestModelLoading(unittest.TestCase):
         X_test = test_data.drop(columns=["Potability"])
         y_test = test_data["Potability"]
 
-        y_pred = loaded_model.predict(X_test)
+        y_pred = model.predict(X_test)
 
         acc = accuracy_score(y_test, y_pred)
         prec = precision_score(y_test, y_pred)
