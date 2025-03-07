@@ -23,8 +23,8 @@ stages:
       nfiles: 2
     - path: src/features.py
       hash: md5
-      md5: 1a2823166f7bc8c8448fd4a9cf648264
-      size: 3082
+      md5: fca18c262f777a41991c4fead34eff72
+      size: 3063
     outs:
     - path: data/processed/
       hash: md5

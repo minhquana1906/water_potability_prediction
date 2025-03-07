@@ -12,18 +12,24 @@ from lightgbm import LGBMClassifier
 from loguru import logger
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (ConfusionMatrixDisplay, RocCurveDisplay,
-                             accuracy_score, confusion_matrix, f1_score,
-                             precision_score, recall_score, roc_auc_score,
-                             roc_curve)
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    RocCurveDisplay,
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    roc_curve,
+)
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 
-from src.config import (CONFUSION_MATRIX_DIR, DATA_DISK, MODELS_DIR,
-                        ROC_CURVE_DIR)
+from src.config import CONFUSION_MATRIX_DIR, DATA_DISK, MODELS_DIR, ROC_CURVE_DIR
 
 dagshub.init(repo_owner="minhquana1906", repo_name="water_potability_prediction", mlflow=True)
 mlflow.set_tracking_uri("https://dagshub.com/minhquana1906/water_potability_prediction.mlflow")
