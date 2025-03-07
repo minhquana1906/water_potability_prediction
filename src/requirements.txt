@@ -116,6 +116,7 @@ pandas==2.2.3
 pathspec==0.12.1
 pathvalidate==3.2.3
 pillow==11.1.0
+pip @ file:///croot/pip_1737991979965/work
 platformdirs==4.3.6
 prompt-toolkit==3.0.50
 propcache==0.3.0
