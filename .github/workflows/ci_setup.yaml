@@ -1,9 +1,6 @@
 name: CI Pipeline
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -52,3 +49,19 @@ jobs:
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
           python scripts/promote_model.py
+
+
+      # Docker build and push
+      - name: Login to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        if: success()
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/water_potability_prediction:latest .
+
+      - name: Push Docker image
+        if: success()
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/water_potability_prediction:latest
